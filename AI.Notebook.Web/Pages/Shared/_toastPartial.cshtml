@@ -1,0 +1,45 @@
+﻿@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor _httpContext
+<div class="toast-container position-fixed top-0 end-0 mt-5 p-3">
+	@if (!string.IsNullOrEmpty(_httpContext.HttpContext.Session.GetString("Notification")))
+	{
+		<div id="liveToast" class="toast border-primary" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="toast-header bg-primary text-white">
+				<strong class="me-auto">System Notification</strong>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+			</div>
+			<div class="toast-body">
+				@_httpContext.HttpContext.Session.GetString("Notification")
+			</div>
+		</div>
+		_httpContext.HttpContext.Session.Remove("Notification");
+	}
+
+	@if (!string.IsNullOrEmpty(_httpContext.HttpContext.Session.GetString("Error")))
+	{
+		<div id="liveToast" class="toast border-danger" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="toast-header bg-danger text-white">
+				<strong class="me-auto">System Notification</strong>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+			</div>
+			<div class="toast-body">
+				@_httpContext.HttpContext.Session.GetString("Error")
+			</div>
+		</div>
+		_httpContext.HttpContext.Session.Remove("Error");
+	}
+
+	@if (!string.IsNullOrEmpty(_httpContext.HttpContext.Session.GetString("Warning")))
+	{
+		<div id="liveToast" class="toast border-warning" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="toast-header bg-warning text-white">
+				<strong class="me-auto">System Notification</strong>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+			</div>
+			<div class="toast-body">
+				@_httpContext.HttpContext.Session.GetString("Warning")
+			</div>
+		</div>
+		_httpContext.HttpContext.Session.Remove("Warning");
+	}
+</div>

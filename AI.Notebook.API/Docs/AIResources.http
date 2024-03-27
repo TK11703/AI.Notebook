@@ -1,0 +1,22 @@
+@rootUrl = https://localhost:7091
+
+GET {{rootUrl}}/AIResources
+Accept: application/json
+
+###
+
+POST {{rootUrl}}/AIResources
+Content-Type: application/json
+
+{
+    "id" : 0,
+    "name": "New item",
+    "active":true
+}
+
+###
+
+DELETE {{rootUrl}}/AIResources?id=8
+
+
+###

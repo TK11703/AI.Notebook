@@ -1,0 +1,220 @@
+﻿@page
+@model AI.Notebook.Web.Pages.SettingsModel
+@{
+	ViewData["Title"] = "Settings";
+}
+<svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+	<symbol id="chevron-right" viewBox="0 0 16 16">
+		<path fill-rule="evenodd" d="M4.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L10.293 8 4.646 2.354a.5.5 0 0 1 0-.708z" />
+	</symbol>
+	<symbol id="geo-fill" viewBox="0 0 16 16">
+		<path fill-rule="evenodd" d="M4 4a4 4 0 1 1 4.5 3.969V13.5a.5.5 0 0 1-1 0V7.97A4 4 0 0 1 4 3.999zm2.493 8.574a.5.5 0 0 1-.411.575c-.712.118-1.28.295-1.655.493a1.319 1.319 0 0 0-.37.265.301.301 0 0 0-.057.09V14l.002.008a.147.147 0 0 0 .016.033.617.617 0 0 0 .145.15c.165.13.435.27.813.395.751.25 1.82.414 3.024.414s2.273-.163 3.024-.414c.378-.126.648-.265.813-.395a.619.619 0 0 0 .146-.15.148.148 0 0 0 .015-.033L12 14v-.004a.301.301 0 0 0-.057-.09 1.318 1.318 0 0 0-.37-.264c-.376-.198-.943-.375-1.655-.493a.5.5 0 1 1 .164-.986c.77.127 1.452.328 1.957.594C12.5 13 13 13.4 13 14c0 .426-.26.752-.544.977-.29.228-.68.413-1.116.558-.878.293-2.059.465-3.34.465-1.281 0-2.462-.172-3.34-.465-.436-.145-.826-.33-1.116-.558C3.26 14.752 3 14.426 3 14c0-.599.5-1 .961-1.243.505-.266 1.187-.467 1.957-.594a.5.5 0 0 1 .575.411z" />
+	</symbol>
+	<symbol id="file-earmark" viewBox="0 0 16 16">
+		<path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5z" />
+	</symbol>
+	
+</svg>
+
+<div class="container px-4 py-5" id="icon-grid">
+	<div class="d-flex justify-content-between align-items-center mb-2 border-bottom">
+		<h2>AI Resources</h2>
+		<div class="btn-toolbar mb-2 mb-md-0">
+			<div class="btn-group me-2">
+				<button type="button" class="btn btn-sm btn-outline-secondary" title="Click to create a new item." data-bs-toggle="modal" data-bs-target="#aiResourceModal">
+					New
+				</button>
+			</div>
+		</div>
+	</div>
+	<p class="text-muted">
+		This listing of resources includes any artificial intelligence component that may be used to handle a request. This resource type would match a valid SDK library or Http REST Api.
+	</p>
+	<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 py-5">
+		@foreach (var item in Model.AIResources)
+		{
+			<div class="col d-flex align-items-start">
+				<svg class="bi text-body-secondary flex-shrink-0 me-3" width="1.75em" height="1.75em"><use xlink:href="#geo-fill" /></svg>
+				<div>
+					<h3 class="fw-bold mb-0 fs-4 text-body-emphasis">@item.Name</h3>
+					<p class="aiResourceDesc">@item.Description</p>
+					<a href="#" class="icon-link" data-bs-toggle="modal" data-bs-target="#aiResourceModal">
+						Edit
+						<svg class="bi"><use xlink:href="#chevron-right" /></svg>
+					</a>
+					<input type="hidden" class="aiResourceId" asp-for="@item.Id" />
+				</div>
+			</div>
+		}
+	</div>
+</div>
+
+<div class="container px-4 py-5" id="icon-grid">
+	<div class="d-flex justify-content-between align-items-center mb-2 border-bottom">
+		<h2>Result Types</h2>
+		<div class="btn-toolbar mb-2 mb-md-0">
+			<div class="btn-group me-2">
+				<button type="button" class="btn btn-sm btn-outline-secondary" title="Click to create a new item." data-bs-toggle="modal" data-bs-target="#resultTypeModal">
+					New
+				</button>
+			</div>
+		</div>
+	</div>
+	<p class="text-muted">
+		This listing of results includes any product returned as the result of an artificial intelligence request. These help identify the request's returned value and control the output of them.
+	</p>
+	<div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 py-5">
+		@foreach (var item in Model.ResultTypes)
+		{
+			<div class="col d-flex align-items-start">
+				<svg class="bi text-body-secondary flex-shrink-0 me-3" width="1.75em" height="1.75em"><use xlink:href="#file-earmark" /></svg>
+				<div>
+					<h3 class="fw-bold mb-0 fs-4 text-body-emphasis">@item.Name</h3>
+					<p class="resultTypeDesc">@item.Description</p>
+					<a href="#" class="icon-link" data-bs-toggle="modal" data-bs-target="#resultTypeModal">
+						Edit
+						<svg class="bi"><use xlink:href="#chevron-right" /></svg>
+					</a>
+					<input type="hidden" class="resultTypeId" asp-for="@item.Id" />
+				</div>
+			</div>
+		}
+	</div>
+</div>
+
+<div class="modal fade" id="aiResourceModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="aiResourceModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<form method="post">
+				<div class="modal-header">
+					<h5 class="modal-title" id="aiResourceModalLabel">AI Resource Dialog</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p class="text-muted">Please use this form to enter the details for this item type.</p>
+					<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+					<div class="mb-3">
+						<label class="form-label" asp-for="AIResourceFormModel.Name"></label>
+						<input type="text" asp-for="AIResourceFormModel.Name" class="form-control" />
+						<span asp-validation-for="AIResourceFormModel.Name" class="text-danger"></span>
+					</div>
+					<div class="mb-3">
+						<label class="form-label" asp-for="AIResourceFormModel.Description"></label>
+						<textarea asp-for="AIResourceFormModel.Description" class="form-control"></textarea>
+						<span asp-validation-for="AIResourceFormModel.Description" class="text-danger"></span>
+					</div>
+					<input type="hidden" asp-for="AIResourceFormModel.Id" value="0" />
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-primary" title="Click to save." asp-page-handler="airesourcesave">Save</button>
+					<button class="btn btn-danger deleteButton" title="Click to delete." asp-page-handler="airesourcedelete">Delete</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" title="Click to cancel.">Close</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="resultTypeModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="resultTypeModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<form method="post">
+				<div class="modal-header">
+					<h5 class="modal-title" id="resultTypeModalLabel">Result Type Dialog</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p class="text-muted">Please use this form to enter the details for this item type.</p>
+					<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+					<div class="mb-3">
+						<label class="form-label" asp-for="ResultTypeFormModel.Name"></label>
+						<input type="text" asp-for="ResultTypeFormModel.Name" class="form-control" />
+						<span asp-validation-for="ResultTypeFormModel.Name" class="text-danger"></span>
+					</div>
+					<div class="mb-3">
+						<label class="form-label" asp-for="ResultTypeFormModel.Description"></label>
+						<textarea asp-for="ResultTypeFormModel.Description" class="form-control"></textarea>
+						<span asp-validation-for="ResultTypeFormModel.Description" class="text-danger"></span>
+					</div>
+					<input type="hidden" asp-for="ResultTypeFormModel.Id" value="0" />
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-primary" title="Click to save." asp-page-handler="resulttypesave">Save</button>
+					<button class="btn btn-danger deleteButton" title="Click to delete." asp-page-handler="resulttypedelete">Delete</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" title="Click to cancel.">Close</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<partial name="_toastPartial" />
+@section scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	<script type="text/javascript" src="~/lib/plugins/jquery-autosize/jquery.autosize.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$(".toast").toast('show');
+			autosize($('textarea'));
+			$('#aiResourceModal').on('show.bs.modal', function (e) {
+				PopulateAIResourceInModal(e.relatedTarget);
+			});
+			$('#aiResourceModal').on('hidden.bs.modal', function (e) {
+				ClearAIResourceModal();
+			});
+			$('#resultTypeModal').on('show.bs.modal', function (e) {
+				PopulateResultTypeInModal(e.relatedTarget);
+			});
+			$('#resultTypeModal').on('hidden.bs.modal', function (e) {
+				ClearResultTypeModal();
+			});
+
+			$(".deleteButton").click(function (e) {
+				e.preventDefault();
+				var btn = $(this);
+				var confirmMessage = "Are you sure you wish to delete this item?";
+				siteConfirm("Confirm Deletion Request", confirmMessage, "No", "Yes", function (result) {
+					if (result) {
+						$(btn).closest("form").attr("action", $(btn).attr("formaction"));
+						$(btn).closest("form").submit();
+					}
+				});
+			});
+		});
+		function PopulateAIResourceInModal(activatorLink) {
+			$("#AIResourceFormModel_Name").val($(activatorLink).siblings("h3").html());
+			$("#AIResourceFormModel_Description").val($(activatorLink).siblings("p.aiResourceDesc").html());
+			$("#AIResourceFormModel_Id").val($(activatorLink).siblings(":hidden.aiResourceId").val());
+			if ($("#AIResourceFormModel_Id").val() == "0" || $("#AIResourceFormModel_Id").val() == "")
+			{
+				$("#aiResourceModal :hidden.deleteButton").addClass("d-none");
+			}
+			else
+			{
+				$("#aiResourceModal :hidden.deleteButton").removeClass("d-none");
+			}
+		}
+		function ClearAIResourceModal() {
+			$("#AIResourceFormModel_Name").val("");
+			$("#AIResourceFormModel_Description").val("");
+			$("#AIResourceFormModel_Id").val("0");
+		}
+		function PopulateResultTypeInModal(activatorLink) {
+			$("#ResultTypeFormModel_Name").val($(activatorLink).siblings("h3").html());
+			$("#ResultTypeFormModel_Description").val($(activatorLink).siblings("p.resultTypeDesc").html());
+			$("#ResultTypeFormModel_Id").val($(activatorLink).siblings(":hidden.resultTypeId").val());
+			if ($("#ResultTypeFormModel_Id").val() == "0" || $("#ResultTypeFormModel_Id").val() == "") {
+				$("#resultTypeModal :hidden.deleteButton").addClass("d-none");
+			}
+			else {
+				$("#resultTypeModal :hidden.deleteButton").removeClass("d-none");
+			}
+		}
+		function ClearResultTypeModal() {
+			$("#ResultTypeFormModel_Name").val("");
+			$("#ResultTypeFormModel_Description").val("");
+			$("#ResultTypeFormModel_Id").val("0");
+		}
+	</script>
+}

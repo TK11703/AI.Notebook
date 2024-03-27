@@ -1,0 +1,92 @@
+﻿@page
+@model IndexModel
+@{
+	ViewData["Title"] = "Home";
+}
+
+<div id="myCarousel" class="carousel slide mb-6" data-bs-ride="carousel">
+	<div class="carousel-indicators">
+		<button type="button" data-bs-target="#myCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+		<button type="button" data-bs-target="#myCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+		<button type="button" data-bs-target="#myCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+		<button type="button" data-bs-target="#myCarousel" data-bs-slide-to="3" aria-label="Slide 4"></button>
+	</div>
+	<div class="carousel-inner">
+		<div class="carousel-item active">
+			<img src="/images/home-carousel1.png" class="bd-placeholder-img" width="100%" height="100%" />
+			<div class="container">
+				<div class="carousel-caption text-start">
+					<h1>Wilderness</h1>
+					<p class="opacity-75">Create an artistic wilderness scene</p>
+				</div>
+			</div>
+		</div>
+		<div class="carousel-item">
+			<img src="/images/home-carousel2.png" class="bd-placeholder-img" width="100%" height="100%" />
+			<div class="container">
+				<div class="carousel-caption text-start">
+					<h1>Active Ocean</h1>
+					<p class="opacity-75">An ultrarealistic ocean scene, from above the water line with small to medium waves and a few sea gulls, and a dolphin jumping in the air</p>
+				</div>
+			</div>
+		</div>
+		<div class="carousel-item">
+			<img src="/images/home-carousel3.png" class="bd-placeholder-img" width="100%" height="100%" />
+			<div class="container">
+				<div class="carousel-caption text-start">
+					<h1>Active Volcano</h1>
+					<p class="opacity-75">A photorealistic image of a volcano with dark clouds and lava spewing from the volcano top, as well as some lava traveling down the peak into a green valley</p>
+				</div>
+			</div>
+		</div>
+		<div class="carousel-item">
+			<img src="/images/home-carousel4.png" class="bd-placeholder-img" width="100%" height="100%" />
+			<div class="container">
+				<div class="carousel-caption text-start">
+					<h1>The Mighty Thor</h1>
+					<p class="opacity-75">An image of Thor flying through their air with a spinning mjolnir in a pixar style</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	<button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev">
+		<span class="carousel-control-prev-icon" aria-hidden="true"></span>
+		<span class="visually-hidden">Previous</span>
+	</button>
+	<button class="carousel-control-next" type="button" data-bs-target="#myCarousel" data-bs-slide="next">
+		<span class="carousel-control-next-icon" aria-hidden="true"></span>
+		<span class="visually-hidden">Next</span>
+	</button>
+</div>
+
+<div class="container col-xxl-8 px-4 py-5">
+	<div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+		<div class="col-10 col-sm-8 col-lg-6">
+			<img src="/images/AINotebook-hero1.png" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="700" height="500" loading="lazy">
+		</div>
+		<div class="col-lg-6">
+			<h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">AI Notebook</h1>
+			<p class="lead">This utility allows you to engage with Artificial Intelligence (AI) models via Http REST calls or interactions with the .NET SDKs. When possible, the requests and results will be saved to recall past interactions.</p>
+			<div class="d-grid gap-2 d-md-flex justify-content-md-start">
+				<a href="/Requests/Item/0" class="btn btn-primary btn-lg px-4 me-md-2">Get Started</a>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="b-example-divider"></div>
+
+<div class="container col-xxl-8 px-4 py-5">
+	<div class="row flex-lg-row align-items-center g-5 py-5">
+		<div class="col-10 col-sm-8 col-lg-6">
+			<img src="/images/AINotebook-hero2.png" class="d-block mx-lg-auto img-fluid" alt="Bootstrap Themes" width="700" height="500" loading="lazy">
+		</div>
+		<div class="col-lg-6">
+			<h1 class="display-5 fw-bold text-body-emphasis lh-1 mb-3">What is AI?</h1>
+			<p class="lead">Artificial intelligence (AI) refers to the ability of computers or robots to perform tasks like humans, such as reasoning, learning, and problem solving. It encompasses systems that can reason, discover meaning, generalize, or learn from past experiences, and it has applications in fields like medical diagnosis, search engines, voice recognition, and chatbots</p>
+		</div>
+	</div>
+</div>
+
+<div class="b-example-divider"></div>
+
