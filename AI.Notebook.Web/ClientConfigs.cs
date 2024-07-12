@@ -14,7 +14,7 @@ public static class ClientConfigs
 	{
 		services.AddHttpClient<RequestClient>(client =>
 		{
-			client.BaseAddress = new Uri(config.GetValue<string>("Clients:RequestModelBaseUri"));
+			client.BaseAddress = new Uri(config.GetValue<string>("Clients:RequestsBaseUri"));
 		})
 		.ConfigurePrimaryHttpMessageHandler(() =>
 		{
@@ -27,7 +27,7 @@ public static class ClientConfigs
 
 		services.AddHttpClient<ResultClient>(client =>
 		{
-			client.BaseAddress = new Uri(config.GetValue<string>("Clients:ResultModelBaseUri"));
+			client.BaseAddress = new Uri(config.GetValue<string>("Clients:ResultsBaseUri"));
 		})
 		.ConfigurePrimaryHttpMessageHandler(() =>
 		{
@@ -40,7 +40,7 @@ public static class ClientConfigs
 
 		services.AddHttpClient<AIResourceClient>(client =>
 		{
-			client.BaseAddress = new Uri(config.GetValue<string>("Clients:AIResourceModelBaseUri"));
+			client.BaseAddress = new Uri(config.GetValue<string>("Clients:AIResourcesBaseUri"));
 		})
 		.ConfigurePrimaryHttpMessageHandler(() =>
 		{
@@ -53,7 +53,20 @@ public static class ClientConfigs
 
 		services.AddHttpClient<ResultTypeClient>(client =>
 		{
-			client.BaseAddress = new Uri(config.GetValue<string>("Clients:ResultTypeModelBaseUri"));
+			client.BaseAddress = new Uri(config.GetValue<string>("Clients:ResultTypesBaseUri"));
+		})
+		.ConfigurePrimaryHttpMessageHandler(() =>
+		{
+			return new SocketsHttpHandler
+			{
+				PooledConnectionLifetime = TimeSpan.FromMinutes(5)
+			};
+		})
+		.SetHandlerLifetime(Timeout.InfiniteTimeSpan);
+
+		services.AddHttpClient<ServicesClient>(client =>
+		{
+			client.BaseAddress = new Uri(config.GetValue<string>("Clients:ServicesBaseUri"));
 		})
 		.ConfigurePrimaryHttpMessageHandler(() =>
 		{

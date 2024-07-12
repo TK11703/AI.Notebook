@@ -14,8 +14,5 @@ public class RequestModelValidator : AbstractValidator<RequestModel>
 			.NotEmpty()
 			.GreaterThan(0);
 
-		RuleFor(x => x.Input)
-			.NotEmpty()
-			.MinimumLength(2);
 	}
 }

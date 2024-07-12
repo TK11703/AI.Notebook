@@ -16,7 +16,7 @@ BEGIN
 		FROM dbo.Requests AS req
 		INNER JOIN dbo.AIResources as res on req.ResourceId = res.Id
 		WHERE 
-		(@Search IS NULL or (req.Input LIKE '%' + @Search +'%' OR req.[Name] LIKE '%' + @Search +'%'))
+		(@Search IS NULL or (req.[Name] LIKE '%' + @Search +'%' OR req.[Name] LIKE '%' + @Search +'%'))
 		AND 
 		((@Begin IS NULL AND @End IS NULL) or req.CreatedDt BETWEEN @Begin AND @End)
 		ORDER BY 

@@ -4,7 +4,7 @@
 	[RequestId] INT NOT NULL,
 	[ResourceId] INT NOT NULL, 
 	[ResultTypeId] INT NOT NULL, 
-	[ResultData] NVARCHAR(MAX) NULL,
+	[ResultData] VARBINARY(MAX) NULL,
 	[CreatedDt] DATETIME NOT NULL, 
 	[UpdatedDt] DATETIME NOT NULL,
 	[CompletedDt] DATETIME,

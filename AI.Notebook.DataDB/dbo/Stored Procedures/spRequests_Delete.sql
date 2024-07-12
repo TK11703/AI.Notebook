@@ -10,6 +10,22 @@ BEGIN
 		WHERE RequestId=@Id;
 
 		Delete 
+		FROM dbo.RequestsTranslator
+		WHERE RequestId=@Id;
+
+		Delete 
+		FROM dbo.RequestsSpeech
+		WHERE RequestId=@Id;
+
+		Delete 
+		FROM dbo.RequestsVision
+		WHERE RequestId=@Id;
+
+		Delete 
+		FROM dbo.RequestsLanguage
+		WHERE RequestId=@Id;
+
+		Delete 
 		FROM dbo.Requests	
 		WHERE Id=@Id;
 

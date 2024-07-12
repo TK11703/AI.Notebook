@@ -15,7 +15,7 @@ public class SpeechServices
 		_speechConfig = SpeechConfig.FromSubscription(serviceKey, serviceRegion);
 	}
 
-	public async Task<SpeechTranscriptionResult> Transcribe(string langCode, byte[] audioInput, bool outputAsAudio = false)
+	public async Task<SpeechTranscriptionResult> Transcribe(string langCode, byte[] audioInput, bool outputAsAudio = false, string? voiceName = null)
 	{
 		using PushAudioInputStream audioInputStream = AudioInputStream.CreatePushStream();
 		audioInputStream.Write(audioInput, audioInput.Length);
@@ -29,7 +29,7 @@ public class SpeechServices
 			byte[]? audioOutput = null;
 			if (outputAsAudio)
 			{
-				audioOutput = await GenerateAudio(result.Text);
+				audioOutput = await GenerateAudio(result.Text, voiceName);
 			}
 			return new SpeechTranscriptionResult()
 			{
@@ -46,7 +46,7 @@ public class SpeechServices
 		};
 	}
 
-	public async Task<SpeechTranslationResult> Translate(string sourceLangCode, string targetLangCode, byte[] audioInput, bool outputAsAudio = false)
+	public async Task<SpeechTranslationResult> Translate(string sourceLangCode, string targetLangCode, byte[] audioInput, bool outputAsAudio = false, string? voiceName = null)
 	{
 		_translationConfig.SpeechRecognitionLanguage = sourceLangCode;
 		_translationConfig.AddTargetLanguage(targetLangCode);
@@ -62,7 +62,7 @@ public class SpeechServices
 			byte[]? audioOutput = null;
 			if (outputAsAudio)
 			{
-				audioOutput = await GenerateAudio(result.Translations[targetLangCode]);
+				audioOutput = await GenerateAudio(result.Translations[targetLangCode], voiceName);
 			}
 			return new SpeechTranslationResult()
 			{
@@ -79,9 +79,16 @@ public class SpeechServices
 			TargetLanguageCode = targetLangCode
 		};
 	}
-	private async Task<byte[]?> GenerateAudio(string textToSpeak)
+	private async Task<byte[]?> GenerateAudio(string textToSpeak, string? voiceName = null)
 	{
-		_speechConfig.SpeechSynthesisVoiceName = "en-GB-RyanNeural";
+		if (!string.IsNullOrEmpty(voiceName))
+		{
+			_speechConfig.SpeechSynthesisVoiceName = voiceName;
+		}
+		else
+		{
+			_speechConfig.SpeechSynthesisVoiceName = "en-GB-RyanNeural";
+		}
 		using SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer(_speechConfig);
 		SpeechSynthesisResult result = await speechSynthesizer.SpeakTextAsync(textToSpeak);
 		if (result.Reason != ResultReason.SynthesizingAudioCompleted)

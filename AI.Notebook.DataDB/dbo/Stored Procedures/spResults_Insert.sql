@@ -3,7 +3,7 @@
 	@ResourceId int,
 	@ResultTypeId int,
 	@CompletedDt datetime = null,
-	@ResultData nvarchar(max),
+	@ResultData varbinary(max),
 	@Id int output
 AS
 BEGIN

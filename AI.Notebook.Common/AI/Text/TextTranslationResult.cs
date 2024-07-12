@@ -8,4 +8,13 @@ public class TextTranslationResult
 	public string? Input { get; set; }
 	public string? Output { get; set; }
 	public byte[]? AudioOutput { get; set; }
+
+	public byte[] GetResultData()
+	{
+		if (AudioOutput != null && AudioOutput.Length > 0)
+		{
+			return AudioOutput;
+		}
+		return System.Text.Encoding.UTF8.GetBytes(Output ?? string.Empty);
+	}
 }

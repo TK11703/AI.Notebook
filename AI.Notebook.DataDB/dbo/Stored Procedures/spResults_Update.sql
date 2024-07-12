@@ -4,7 +4,7 @@
 	@ResourceId int,
 	@ResultTypeId int,
 	@CompletedDt datetime = null,
-	@ResultData nvarchar(max)
+	@ResultData varbinary(max)
 AS
 BEGIN
 	SET NOCOUNT OFF;

@@ -25,6 +25,13 @@ public class ResultTypeData : IResultTypeData
 		return results.FirstOrDefault();
 	}
 
+	public async Task<ResultTypeModel?> GetByNameAsync(string name)
+	{
+		var results = await _dataAccess.LoadDataAsync<ResultTypeModel, dynamic>("dbo.spResultTypes_GetByName", new { Name = name });
+
+		return results.FirstOrDefault();
+	}
+
 	public async Task<int> InsertAsync(ResultTypeModel item)
 	{
 		var p = new DynamicParameters();		

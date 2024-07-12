@@ -55,6 +55,50 @@ public sealed class RequestClient
 		return null;
 	}
 
+	public async Task<RequestTranslatorModel?> GetTranslatorModel(int id)
+	{
+		using HttpResponseMessage response = await _httpClient.GetAsync($"Translator/{id}");
+		if (response.IsSuccessStatusCode)
+		{
+			return await response.Content.ReadFromJsonAsync<RequestTranslatorModel>();
+		}
+		_logger.LogError($"Http Status: {response.StatusCode}{Environment.NewLine}Http Message: {await response.Content.ReadAsStringAsync()}");
+		return null;
+	}
+
+	public async Task<RequestSpeechModel?> GetSpeechModel(int id)
+	{
+		using HttpResponseMessage response = await _httpClient.GetAsync($"Speech/{id}");
+		if (response.IsSuccessStatusCode)
+		{
+			return await response.Content.ReadFromJsonAsync<RequestSpeechModel>();
+		}
+		_logger.LogError($"Http Status: {response.StatusCode}{Environment.NewLine}Http Message: {await response.Content.ReadAsStringAsync()}");
+		return null;
+	}
+
+	public async Task<RequestVisionModel?> GetVisionModel(int id)
+	{
+		using HttpResponseMessage response = await _httpClient.GetAsync($"Vision/{id}");
+		if (response.IsSuccessStatusCode)
+		{
+			return await response.Content.ReadFromJsonAsync<RequestVisionModel>();
+		}
+		_logger.LogError($"Http Status: {response.StatusCode}{Environment.NewLine}Http Message: {await response.Content.ReadAsStringAsync()}");
+		return null;
+	}
+
+	public async Task<RequestLanguageModel?> GetLanguageModel(int id)
+	{
+		using HttpResponseMessage response = await _httpClient.GetAsync($"Language/{id}");
+		if (response.IsSuccessStatusCode)
+		{
+			return await response.Content.ReadFromJsonAsync<RequestLanguageModel>();
+		}
+		_logger.LogError($"Http Status: {response.StatusCode}{Environment.NewLine}Http Message: {await response.Content.ReadAsStringAsync()}");
+		return null;
+	}
+
 	public async Task<int> Create(RequestModel item)
 	{
 		using HttpResponseMessage response = await _httpClient.PostAsJsonAsync($"", item);
@@ -66,9 +110,90 @@ public sealed class RequestClient
 		return 0;
 	}
 
+	public async Task<int> Create(RequestTranslatorModel item)
+	{
+
+		using HttpResponseMessage response = await _httpClient.PostAsJsonAsync($"Translator/", item);
+		if (response.IsSuccessStatusCode)
+		{
+			return await response.Content.ReadFromJsonAsync<int>();
+		}
+		_logger.LogError($"Http Status: {response.StatusCode}{Environment.NewLine}Http Message: {await response.Content.ReadAsStringAsync()}");
+		return 0;
+	}
+
+	public async Task<int> Create(RequestSpeechModel item)
+	{
+		using HttpResponseMessage response = await _httpClient.PostAsJsonAsync($"Speech/", item);
+		if (response.IsSuccessStatusCode)
+		{
+			return await response.Content.ReadFromJsonAsync<int>();
+		}
+		_logger.LogError($"Http Status: {response.StatusCode}{Environment.NewLine}Http Message: {await response.Content.ReadAsStringAsync()}");
+		return 0;
+	}
+
+	public async Task<int> Create(RequestVisionModel item)
+	{
+		using HttpResponseMessage response = await _httpClient.PostAsJsonAsync($"Vision/", item);
+		if (response.IsSuccessStatusCode)
+		{
+			return await response.Content.ReadFromJsonAsync<int>();
+		}
+		_logger.LogError($"Http Status: {response.StatusCode}{Environment.NewLine}Http Message: {await response.Content.ReadAsStringAsync()}");
+		return 0;
+	}
+
+	public async Task<int> Create(RequestLanguageModel item)
+	{
+		using HttpResponseMessage response = await _httpClient.PostAsJsonAsync($"Language/", item);
+		if (response.IsSuccessStatusCode)
+		{
+			return await response.Content.ReadFromJsonAsync<int>();
+		}
+		_logger.LogError($"Http Status: {response.StatusCode}{Environment.NewLine}Http Message: {await response.Content.ReadAsStringAsync()}");
+		return 0;
+	}
+
 	public async Task Update(RequestModel item)
 	{
 		using HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"{item.Id}", item);
+		if (!response.IsSuccessStatusCode)
+		{
+			_logger.LogError($"Http Status: {response.StatusCode}{Environment.NewLine}Http Message: {await response.Content.ReadAsStringAsync()}");
+		}
+	}
+
+	public async Task Update(RequestLanguageModel item)
+	{
+		using HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"Language/{item.Id}", item);
+		if (!response.IsSuccessStatusCode)
+		{
+			_logger.LogError($"Http Status: {response.StatusCode}{Environment.NewLine}Http Message: {await response.Content.ReadAsStringAsync()}");
+		}
+	}
+
+	public async Task Update(RequestVisionModel item)
+	{
+		using HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"Vision/{item.Id}", item);
+		if (!response.IsSuccessStatusCode)
+		{
+			_logger.LogError($"Http Status: {response.StatusCode}{Environment.NewLine}Http Message: {await response.Content.ReadAsStringAsync()}");
+		}
+	}
+
+	public async Task Update(RequestSpeechModel item)
+	{
+		using HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"Speech/{item.Id}", item);
+		if (!response.IsSuccessStatusCode)
+		{
+			_logger.LogError($"Http Status: {response.StatusCode}{Environment.NewLine}Http Message: {await response.Content.ReadAsStringAsync()}");
+		}
+	}
+
+	public async Task Update(RequestTranslatorModel item)
+	{
+		using HttpResponseMessage response = await _httpClient.PutAsJsonAsync($"Translator/{item.Id}", item);
 		if (!response.IsSuccessStatusCode)
 		{
 			_logger.LogError($"Http Status: {response.StatusCode}{Environment.NewLine}Http Message: {await response.Content.ReadAsStringAsync()}");

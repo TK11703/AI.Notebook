@@ -24,35 +24,57 @@ public class TextTranslationServices
 		};
 		foreach(var language in response.Translation)
 		{
-			result.SupportedLanguages.Add(new SupportedLanguage()
+			if(!result.SupportedLanguages.Exists(x=>x.Key == language.Key))
 			{
-				Key = language.Key,
-				Name = language.Value.Name,
-				SupportsTranslation = true
-			});
+				result.SupportedLanguages.Add(new SupportedLanguage()
+				{
+					Key = language.Key,
+					Name = language.Value.Name,
+					SupportsTranslation = true
+				});
+			}
+			else
+			{
+				result.SupportedLanguages.First(x=>x.Key == language.Key).SupportsTranslation = true;
+			}			
 		}
 		foreach (var language in response.Transliteration)
 		{
-			result.SupportedLanguages.Add(new SupportedLanguage()
+			if (!result.SupportedLanguages.Exists(x => x.Key == language.Key))
 			{
-				Key = language.Key,
-				Name = language.Value.Name,
-				SupportsTransliteration = true
-			});
+				result.SupportedLanguages.Add(new SupportedLanguage()
+				{
+					Key = language.Key,
+					Name = language.Value.Name,
+					SupportsTransliteration = true
+				});
+			}
+			else
+			{
+				result.SupportedLanguages.First(x => x.Key == language.Key).SupportsTransliteration = true;
+			}
 		}
 		foreach (var language in response.Dictionary)
 		{
-			result.SupportedLanguages.Add(new SupportedLanguage()
+			if (!result.SupportedLanguages.Exists(x => x.Key == language.Key))
 			{
-				Key = language.Key,
-				Name = language.Value.Name,
-				SupportsDictionary = true
-			});
+				result.SupportedLanguages.Add(new SupportedLanguage()
+				{
+					Key = language.Key,
+					Name = language.Value.Name,
+					SupportsDictionary = true
+				});
+			}
+			else
+			{
+				result.SupportedLanguages.First(x => x.Key == language.Key).SupportsDictionary = true;
+			}
 		}
+		result.SupportedLanguages.Sort((o1, o2) => o1.Name.CompareTo(o2.Name));
 		return result;
 	}
 
-	public async Task<TextTranslationResult> Translate(string targetLangCode, string input, bool outputAsAudio = false)
+	public async Task<TextTranslationResult> Translate(string targetLangCode, string input, bool outputAsAudio = false, string? voiceName = null)
 	{
 		Response<IReadOnlyList<TranslatedTextItem>> translationResponse = await _translationClient.TranslateAsync(targetLangCode, input);
 		IReadOnlyList<TranslatedTextItem> translations = translationResponse.Value;
@@ -73,7 +95,7 @@ public class TextTranslationServices
 		};
 	}
 
-	public async Task<TextTranslationResult> Translate(string sourceLangCode, string targetLangCode, string input, bool outputAsAudio = false)
+	public async Task<TextTranslationResult> Translate(string sourceLangCode, string targetLangCode, string input, bool outputAsAudio = false, string? voiceName = null)
 	{
 		Response<IReadOnlyList<TranslatedTextItem>> translationResponse = await _translationClient.TranslateAsync(targetLanguage: targetLangCode, sourceLanguage: sourceLangCode, text: input);
 		IReadOnlyList<TranslatedTextItem> translations = translationResponse.Value;
@@ -81,7 +103,7 @@ public class TextTranslationServices
 		byte[]? audioOutput = null;
 		if (outputAsAudio)
 		{
-			audioOutput = await GenerateAudio(translation?.Translations?[0]?.Text);
+			audioOutput = await GenerateAudio(translation?.Translations?[0]?.Text, voiceName);
 		}
 		return new TextTranslationResult()
 		{
@@ -95,11 +117,18 @@ public class TextTranslationServices
 		};
 	}
 
-	private async Task<byte[]?> GenerateAudio(string? textToSpeak)
+	private async Task<byte[]?> GenerateAudio(string? textToSpeak, string? voiceName = null)
 	{
 		if (!string.IsNullOrEmpty(textToSpeak))
 		{
-			_speechConfig.SpeechSynthesisVoiceName = "en-GB-RyanNeural";
+			if(!string.IsNullOrEmpty(voiceName))
+			{
+				_speechConfig.SpeechSynthesisVoiceName = voiceName;
+			}
+			else
+			{
+				_speechConfig.SpeechSynthesisVoiceName = "en-GB-RyanNeural";
+			}			
 			using SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer(_speechConfig);
 			SpeechSynthesisResult result = await speechSynthesizer.SpeakTextAsync(textToSpeak);
 			if (result.Reason != ResultReason.SynthesizingAudioCompleted)

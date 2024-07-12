@@ -17,11 +17,6 @@ public class RequestNewModel
 	[Display(Name = "AI Resource")]
 	public int ResourceId { get; set; }
 
-	[Required]
-	[Display(Name = "Prompt/Input")]
-	[MinLength(2, ErrorMessage = "The {0} must be at least {1} characters.")]	
-	public string Prompt { get; set; } = string.Empty;
-
 	public DateTime? CreatedDt { get; set; }
 
 	public DateTime? UpdatedDt { get; set; }

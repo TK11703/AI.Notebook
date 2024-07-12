@@ -26,6 +26,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddScoped<RouterBase, AIResourceRouter>();
 builder.Services.AddScoped<RouterBase, ResultTypeRouter>();
 builder.Services.AddScoped<RouterBase, RequestRouter>();
+builder.Services.AddScoped<RouterBase, ServicesRouter>();
 builder.Services.AddScoped<RouterBase, ResultRouter>();
 
 var app = builder.Build();

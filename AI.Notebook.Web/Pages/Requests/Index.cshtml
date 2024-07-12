@@ -3,7 +3,7 @@
 @{
 	ViewData["Title"] = "Requests";
 }
-@section header{
+@section header {
 	<link rel="stylesheet" href="~/lib/plugins/jquery-daterangepicker/daterangepicker.css" />
 }
 <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
@@ -26,14 +26,14 @@
 	<h3>@ViewData["Title"]</h3>
 	<div class="btn-toolbar mb-2 mb-md-0">
 		<div class="btn-group me-2">
-			<a href="/Requests/Item/0" class="btn btn-sm btn-outline-primary" title="Click to create a new request.">New Request</a>
+			<button type="button" class="btn btn-sm btn-outline-primary" title="Click to create a new request." data-bs-toggle="modal" data-bs-target="#newAIRequestModal">New Request</button>
 		</div>
 		<div class="btn-group me-2">
 			<button id="pageSizeOptions" type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle d-flex align-items-center gap-1" title="Click to select the page size for the results." data-bs-toggle="dropdown" aria-expanded="false">
 				<svg class="bi pe-none me-2" width="16" height="16"><use xlink:href="#list-ol" /></svg>
 				Results Per Page (@Model.PageSubmission.PageSize)
 			</button>
-			<ul  class="dropdown-menu">
+			<ul class="dropdown-menu">
 				<li><a class="dropdown-item" href="javascript:void(0);" data-itemvalue="10">10</a></li>
 				<li><a class="dropdown-item" href="javascript:void(0);" data-itemvalue="25">25</a></li>
 				<li><a class="dropdown-item" href="javascript:void(0);" data-itemvalue="50">50</a></li>
@@ -76,7 +76,7 @@
 	<input type="hidden" asp-for="PageSubmission.BeginDate" />
 	<input type="hidden" asp-for="PageSubmission.EndDate" />
 	<div id="filterOptions" class="card text-bg-light @{
-						@((!Model.PageSubmission.ContainsFilter()) ? new {dnone="d-none"} : null)
+								@((!Model.PageSubmission.ContainsFilter()) ? new {dnone="d-none"} : null)
 }">
 		<div class="card-header">Filter Options</div>
 		<div class="card-body g-1">
@@ -113,7 +113,7 @@
 		@foreach (var request in Model.PageResult.Collection)
 		{
 			<tr>
-				<td><a href="/Requests/Item/@request.Id">@request.Name</a></td>
+				<td><a href="@request.ItemUrlPath">@request.Name</a></td>
 				<td>@request.AIResource.Name</td>
 				<td>@request.CreatedDt</td>
 				<td>@request.UpdatedDt</td>
@@ -137,7 +137,7 @@
 </table>
 <nav aria-label="Application page navigation" class="mt-5">
 	<ul class="pagination justify-content-center">
-		<li class="page-item @{@((Model.PageResult.IsFirstPage) ? new {disabled="disabled"} : null)}">
+		<li class="page-item" @{@((Model.PageResult.IsFirstPage) ? new {disabled="disabled"} : null)}>
 			<a class="page-link" asp-page="./Index" asp-route-currentpage="@(Model.PageResult.CurrentPage-1)">Previous</a>
 		</li>
 
@@ -153,11 +153,55 @@
 			}
 		}
 
-		<li class="page-item @{@((Model.PageResult.IsLastPage) ? new {disabled="disabled"} : null)}">
+		<li class="page-item" @{@((Model.PageResult.IsLastPage) ? new {disabled="disabled"} : null)}>
 			<a class="page-link" asp-page="./Index" asp-route-currentpage="@(Model.PageResult.CurrentPage+1)">Next</a>
 		</li>
 	</ul>
 </nav>
+
+<div class="modal fade" id="newAIRequestModal" tabindex="-1" aria-labelledby="newAIRequestModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<form method="post" asp-page-handler="newrequest">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h1 class="modal-title fs-5" id="newAIRequestModalLabel">Create a new AI resource request</h1>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p class="text-muted small">
+						Use the form below to enter details for an AI request!
+					</p>
+					<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+					<div class="row">
+						<div class="col">
+							<div class="mb-3">
+								<label asp-for="RequestFormModel.Name" class="form-label"></label>
+								<input type="text" class="form-control" asp-for="RequestFormModel.Name">
+								<p class="text-muted small">Enter a name to identify this request.</p>
+								<span asp-validation-for="RequestFormModel.Name" class="text-danger"></span>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col">
+							<div class="mb-3">
+								<label class="form-label" asp-for="RequestFormModel.ResourceId"></label>
+								<select id="aiResourceSelection" asp-for="RequestFormModel.ResourceId" asp-items="Model.AIResourceList" class="form-select" style="width: 100%"></select>
+								<p class="text-muted small">Select which AI resource to use.</p>
+								<span asp-validation-for="RequestFormModel.ResourceId" class="text-danger"></span>
+							</div>
+						</div>
+					</div>
+					<input type="hidden" asp-for="RequestFormModel.Id" />
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					<button type="submit" class="btn btn-primary">Save</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
 
 <partial name="_toastPartial" />
 @section scripts {
@@ -177,8 +221,7 @@
 				$("#PageSubmission_BeginDate").val(start.format('MM/DD/YYYY'));
 				$("#PageSubmission_EndDate").val(end.format('MM/DD/YYYY'));
 			});
-			if ($("#PageSubmission_BeginDate").val() != "")
-			{
+			if ($("#PageSubmission_BeginDate").val() != "") {
 				const date = new Date($("#PageSubmission_BeginDate").val());
 				const formattedDate = (date.getMonth() + 1) + '/' + date.getDate() + '/' + date.getFullYear();
 				$('input[name="daterange"]').data('daterangepicker').setStartDate(date);
@@ -201,8 +244,7 @@
 			});
 			SetupPagingEvents();
 		});
-		function SetupPagingEvents() 
-		{
+		function SetupPagingEvents() {
 			$("#pageSizeOptions").on('hide.bs.dropdown', ({ clickEvent }) => {
 				if (clickEvent?.target) {
 					$("#PageSubmission_PageSize").val($(clickEvent.target).data('itemvalue'));
@@ -227,8 +269,7 @@
 				}
 			});
 		}
-		function SubmitPagingForm()
-		{
+		function SubmitPagingForm() {
 			var $form = $("#pagingForm");
 			$form.trigger('submit');
 		}
