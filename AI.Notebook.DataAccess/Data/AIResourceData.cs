@@ -1,5 +1,5 @@
 ﻿using AI.Notebook.DataAccess.DBAccess;
-using AI.Notebook.Common.Models;
+using AI.Notebook.Common.Entities;
 using Dapper;
 using System.Data;
 
@@ -13,19 +13,19 @@ public class AIResourceData : IAIResourceData
 		_dataAccess = dataAccess;
 	}
 
-	public async Task<IEnumerable<AIResourceModel>> GetAllAsync()
+	public async Task<IEnumerable<AIResource>> GetAllAsync()
 	{
-		return await _dataAccess.LoadDataAsync<AIResourceModel, dynamic>("dbo.spAIResources_GetAll", new { });
+		return await _dataAccess.LoadDataAsync<AIResource, dynamic>("dbo.spAIResources_GetAll", new { });
 	}
 
-	public async Task<AIResourceModel?> GetAsync(int id)
+	public async Task<AIResource?> GetAsync(int id)
 	{
-		var results = await _dataAccess.LoadDataAsync<AIResourceModel, dynamic>("dbo.spAIResources_Get", new { Id = id });
+		var results = await _dataAccess.LoadDataAsync<AIResource, dynamic>("dbo.spAIResources_Get", new { Id = id });
 
 		return results.FirstOrDefault();
 	}
 
-	public async Task<int> InsertAsync(AIResourceModel item)
+	public async Task<int> InsertAsync(AIResource item)
 	{
 		var p = new DynamicParameters();
 		p.Add(name: "@Name", item.Name);
@@ -39,7 +39,7 @@ public class AIResourceData : IAIResourceData
 		return newId.HasValue ? newId.Value : 0;
 	}
 
-	public int Update(AIResourceModel item)
+	public int Update(AIResource item)
 	{
 		return _dataAccess.SaveData<dynamic>("dbo.spAIResources_Update", new { item.Id, item.Name, item.Description, item.Active });
 	}

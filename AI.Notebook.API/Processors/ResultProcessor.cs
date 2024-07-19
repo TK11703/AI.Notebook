@@ -9,9 +9,9 @@ public class ResultProcessor
 
 	}
 
-	public async Task<ResultTranslatorModel?> SaveTranslatorResultAsync(TextTranslationResult result, RequestTranslatorModel aRequestModel, IResultData resultData, IResultTypeData resultTypeData)
+	public async Task<TranslatorResult?> SaveTranslatorResultAsync(TextTranslationResult result, TranslatorRequest aRequestModel, IResultData resultData, IResultTypeData resultTypeData)
 	{
-		ResultTypeModel resultType = null!;
+		ResultType resultType = null!;
 		if (aRequestModel.OutputAsAudio)
 		{
 			resultType = await resultTypeData.GetByNameAsync("Binary/Audio");
@@ -25,7 +25,7 @@ public class ResultProcessor
 			Exception ex = new("Result type not found");
 			throw ex;
 		}
-		int resultId = await resultData.InsertAsync(new ResultModel()
+		int resultId = await resultData.InsertAsync(new ResultBase()
 		{
 			RequestId = aRequestModel.RequestId,
 			ResourceId = aRequestModel.ResourceId,
@@ -38,7 +38,7 @@ public class ResultProcessor
 			Exception ex = new("Failed to save result");
 			throw ex;
 		}
-		ResultTranslatorModel resultModel = new ResultTranslatorModel()
+		TranslatorResult resultModel = new TranslatorResult()
 		{
 			ResultId = resultId,
 			SourceLangCode = aRequestModel.SourceLangCode,

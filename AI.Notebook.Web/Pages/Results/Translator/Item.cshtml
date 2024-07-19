@@ -1,0 +1,164 @@
+﻿@page "{Id:int}"
+@model AI.Notebook.Web.Pages.Results.Translator.ItemModel
+@{
+	ViewData["Title"] = "Translator Result Details";
+}
+@section header {
+
+}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+	<h3>@ViewData["Title"]</h3>
+</div>
+<div class="row mb-3">
+	<div class="col">
+		<form method="post">
+			<div class="card">
+				<img src="/images/request-submission.png" class="card-img-top" alt="an image of some circuits with wires.">
+				<div class="card-body">
+					<div class="row mb-3">
+						<div class="col">
+							<label asp-for="ResultModel.SourceLanguage" class="form-label"></label>
+							<input type="text" class="form-control" asp-for="ResultModel.SourceLanguage" readonly>
+						</div>
+						<div class="col">
+							<label asp-for="ResultModel.TargetLanguage" class="form-label"></label>
+							<input type="text" class="form-control" asp-for="ResultModel.TargetLanguage" readonly>
+						</div>
+						<div class="col">
+							<label class="form-label" id="translatorOperation">Requested Operation</label>
+							<select class="form-select" for="translatorOperation" disabled>
+								@{
+									if (Model.ResultModel.Translate)
+									{
+										<option value="translate" selected>Translate</option>
+									}
+									else
+									{
+										<option value="translate">Translate</option>
+									}
+									if(Model.ResultModel.Transliterate)
+									{
+										<option value="transliterate" selected>Transliterate</option>
+									}
+									else
+									{
+										<option value="transliterate">Transliterate</option>
+									}
+								}
+							</select>							
+						</div>
+					</div>
+					<div class="row mb-3">
+						<div class="col">
+							<label asp-for="ResultModel.Prompt" class="form-label"></label>
+							<textarea class="form-control" asp-for="ResultModel.Prompt" readonly></textarea>
+						</div>
+					</div>
+					<div class="row mb-3">
+						<div class="col">
+							<label class="form-label">Preferred Output</label>
+							<div>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="checkbox" asp-for="ResultModel.OutputAsText" disabled>
+									<label class="form-check-label" asp-for="ResultModel.OutputAsText"></label>
+								</div>
+								<div class="form-check form-check-inline">
+									<input class="form-check-input" type="checkbox" asp-for="ResultModel.OutputAsAudio" disabled>
+									<label class="form-check-label" asp-for="ResultModel.OutputAsAudio"></label>
+								</div>
+							</div>
+						</div>
+						<div class="col">
+							<label asp-for="ResultModel.ResultTypeId" class="form-label"></label>
+							<input type="text" class="form-control" asp-for="ResultModel.ResultType.Name" readonly />
+						</div>
+					</div>
+					@{
+						if (Model.ResultModel.OutputAsAudio)
+						{
+							<div class="row mb-3">
+								<div class="col">
+									<label asp-for="ResultModel.VoiceName" class="form-label"></label>
+									<input asp-for="ResultModel.VoiceName" type="text" class="form-control" disabled>
+								</div>
+								<div class="col">
+									<label asp-for="ResultModel.Ssml" class="form-label"></label>
+									<textarea class="form-control" asp-for="ResultModel.Ssml" disabled></textarea>
+								</div>
+								<div class="col">
+									<label asp-for="ResultModel.SsmlUrl" class="form-label"></label>
+									<input type="text" class="form-control" asp-for="ResultModel.SsmlUrl" disabled />
+								</div>
+							</div>
+						}
+					}
+					<div class="row mb-3">
+						<div class="col">
+							@{
+								if (Model.ResultModel != null && Model.ResultModel.ResultType != null && Model.ResultModel.ResultType.Id > 0 
+									&& !string.IsNullOrEmpty(Model.ResultModel.ResultType.Name) && Model.ResultModel.ResultData.Length > 0)
+								{
+									await Html.RenderPartialAsync("_ResultDisplayPartial", Model.ResultModel);
+								}
+							}
+						</div>
+					</div>
+						
+					<input type="hidden" asp-for="ResultModel.Id" />
+				</div>
+				<div class="card-footer">
+					<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
+						<div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+							@if (Model.Id > 0)
+							{
+								<div class="btn-group me-2" role="group" aria-label="Delete Group">
+									<button id="deleteButton" type="button" class="btn btn-danger btn-sm" title="Click to delete this result" data-bs-toggle="modal" data-bs-target="#deleteResultModal">Delete</button>
+								</div>
+							}
+						</div>
+						<div>
+							<h6>Created On <span class="badge text-bg-secondary">@Model.ResultModel.CreatedDt.ToString()</span></h6>
+							<h6>Last Updated <span class="badge text-bg-secondary">@Model.ResultModel.UpdatedDt.ToString()</span></h6>
+							<h6>Completed On <span class="badge text-bg-secondary">@Model.ResultModel.CompletedDt.ToString()</span></h6>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="modal fade" id="deleteResultModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="deleteResultModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<form method="post">
+				<div class="modal-header">
+					<h5 class="modal-title" id="aiResourceModalLabel">Delete Result Confirmation</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p>Are you sure you wish to delete the result?</p>
+					<p><span class="badge text-bg-danger">CAUTION:</span> This action cannot be undone.</p>
+					<input type="hidden" asp-for="ResultModel.Id" />
+					<input type="hidden" asp-for="ResultModel.ResultId" />
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-danger" title="Click to delete." asp-page-handler="delete" asp-route-id="@Model.ResultModel.Id" asp-route-resultid="@Model.ResultModel.ResultId">Delete</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" title="Click to cancel.">Cancel</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+<partial name="_toastPartial" />
+@section scripts {
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
+	<script type="text/javascript" src="~/lib/plugins/jquery-autosize/jquery.autosize.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function () {
+			$(".toast").toast('show');
+			autosize($('textarea'));
+		});
+	</script>
+}

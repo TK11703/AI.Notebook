@@ -1,12 +1,12 @@
-﻿using AI.Notebook.Common.Models;
+﻿using AI.Notebook.Common.Entities;
 
 namespace AI.Notebook.DataAccess.Data;
 public interface IResultTypeData
 {
 	Task<bool> DeleteAsync(int id);
-	Task<ResultTypeModel?> GetAsync(int id);
-	Task<ResultTypeModel?> GetByNameAsync(string name);
-	Task<IEnumerable<ResultTypeModel>> GetAllAsync();
-	Task<int> InsertAsync(ResultTypeModel item);
-	int Update(ResultTypeModel item);
+	Task<ResultType?> GetAsync(int id);
+	Task<ResultType?> GetByNameAsync(string name);
+	Task<IEnumerable<ResultType>> GetAllAsync();
+	Task<int> InsertAsync(ResultType item);
+	int Update(ResultType item);
 }

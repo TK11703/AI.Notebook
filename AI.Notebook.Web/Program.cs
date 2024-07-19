@@ -1,8 +1,8 @@
 using AI.Notebook.Web;
+using AI.Notebook.Web.Extensions;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 
 builder.Services.AddRazorPages();
 
@@ -28,6 +28,8 @@ builder.Services.Configure<CookiePolicyOptions>(options =>
 });
 builder.Services.AddHttpContextAccessor();
 
+builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -39,6 +41,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 app.UseStaticFiles();
 
 app.UseSession();
@@ -50,5 +53,7 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapRazorPages();
+
+app.MapFileHandlerEndpoints();
 
 app.Run();

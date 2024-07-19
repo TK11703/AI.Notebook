@@ -1,5 +1,5 @@
 ﻿using AI.Notebook.DataAccess.DBAccess;
-using AI.Notebook.Common.Models;
+using AI.Notebook.Common.Entities;
 using System.Data;
 using Dapper;
 using AI.Notebook.Common.AI.Text;
@@ -15,15 +15,15 @@ public class ResultData : IResultData
 		_dataAccess = dataAccess;
 	}
 
-	public async Task<IEnumerable<ResultModel>> GetByRequestAsync(int requestId)
+	public async Task<IEnumerable<ResultBase>> GetByRequestAsync(int requestId)
 	{
-		var results = await _dataAccess.LoadDataAsync<ResultModel, dynamic>("dbo.spResults_GetByRequest", new { RequestId = requestId });
+		var results = await _dataAccess.LoadDataAsync<ResultBase, dynamic>("dbo.spResults_GetByRequest", new { RequestId = requestId });
 		if(results != null)
 		{
 			AIResourceData aiResourceDataItems = new AIResourceData(_dataAccess);
-			IEnumerable<AIResourceModel> aiResources = await aiResourceDataItems.GetAllAsync();
+			IEnumerable<AIResource> aiResources = await aiResourceDataItems.GetAllAsync();
 			ResultTypeData resultTypeDataItems = new ResultTypeData(_dataAccess);
-			IEnumerable<ResultTypeModel> resultTypes = await resultTypeDataItems.GetAllAsync();
+			IEnumerable<ResultType> resultTypes = await resultTypeDataItems.GetAllAsync();
 			foreach (var result in results)
 			{
 				result.AIResource = aiResources.First(x => x.Id.Equals(result.ResourceId));
@@ -31,18 +31,18 @@ public class ResultData : IResultData
 			}
 			return results;
 		}
-		return Enumerable.Empty<ResultModel>();
+		return Enumerable.Empty<ResultBase>();
 	}
 
-	public async Task<IEnumerable<ResultModel>> GetByResourceAsync(int resourceId)
+	public async Task<IEnumerable<ResultBase>> GetByResourceAsync(int resourceId)
 	{
-		var results = await _dataAccess.LoadDataAsync<ResultModel, dynamic>("dbo.spResults_GetByResource", new { ResourceId = resourceId });
+		var results = await _dataAccess.LoadDataAsync<ResultBase, dynamic>("dbo.spResults_GetByResource", new { ResourceId = resourceId });
 		if (results != null)
 		{
 			AIResourceData aiResourceDataItems = new AIResourceData(_dataAccess);
-			IEnumerable<AIResourceModel> aiResources = await aiResourceDataItems.GetAllAsync();
+			IEnumerable<AIResource> aiResources = await aiResourceDataItems.GetAllAsync();
 			ResultTypeData resultTypeDataItems = new ResultTypeData(_dataAccess);
-			IEnumerable<ResultTypeModel> resultTypes = await resultTypeDataItems.GetAllAsync();
+			IEnumerable<ResultType> resultTypes = await resultTypeDataItems.GetAllAsync();
 			foreach (var result in results)
 			{
 				result.AIResource = aiResources.First(x => x.Id.Equals(result.ResourceId));
@@ -50,12 +50,12 @@ public class ResultData : IResultData
 			}
 			return results;
 		}
-		return Enumerable.Empty<ResultModel>();
+		return Enumerable.Empty<ResultBase>();
 	}
 
-	public async Task<ResultModel?> GetAsync(int id)
+	public async Task<ResultBase?> GetAsync(int id)
 	{
-		var results = await _dataAccess.LoadDataAsync<ResultModel, dynamic>("dbo.spResults_Get", new { Id = id });
+		var results = await _dataAccess.LoadDataAsync<ResultBase, dynamic>("dbo.spResults_Get", new { Id = id });
 		if(results != null)
 		{
 			var result = results.FirstOrDefault();
@@ -71,12 +71,54 @@ public class ResultData : IResultData
 		return null;
 	}
 
-	public async Task<ResultTranslatorModel?> GetTranslatorAsync(int resultId)
+	public async Task<PageResult<ResultBase>> GetPagedAsync(PageRequest pageRequest)
+	{
+		PageResult<ResultBase> results = new PageResult<ResultBase>(pageRequest.PageSize, pageRequest.Start);
+		var p = new DynamicParameters();
+		p.Add(name: "@SortBy", pageRequest.SortBy);
+		p.Add(name: "@SortOrder", pageRequest.SortDirection);
+		p.Add(name: "@PageSize", pageRequest.PageSize);
+		p.Add(name: "@Start", pageRequest.Start);
+		p.Add(name: "@PageSize", pageRequest.PageSize);
+		if (!string.IsNullOrEmpty(pageRequest.Filter))
+		{
+			p.Add(name: "@Search", pageRequest.Filter);
+		}
+		if (pageRequest.BeginDate.HasValue)
+		{
+			p.Add(name: "@Begin", pageRequest.BeginDate.Value.Date);
+		}
+		if (pageRequest.EndDate.HasValue)
+		{
+			p.Add(name: "@End", pageRequest.EndDate.Value.Date);
+		}
+		p.Add(name: "@Total", value: 0, dbType: DbType.Int32, direction: ParameterDirection.Output);
+		var resultSubset = await _dataAccess.LoadDataAsync<ResultBase, dynamic>("dbo.spResults_GetPaged", p);
+		if (resultSubset != null)
+		{
+			results.ItemCount = p.Get<int>("@Total");
+			AIResourceData aiResourceDataItems = new AIResourceData(_dataAccess);
+			IEnumerable<AIResource> aiResources = await aiResourceDataItems.GetAllAsync();
+			ResultTypeData resultTypeDataItems = new ResultTypeData(_dataAccess);
+			IEnumerable<ResultType> resultTypes = await resultTypeDataItems.GetAllAsync();
+			foreach (var item in resultSubset)
+			{
+				item.AIResource = aiResources.First(x => x.Id == item.ResourceId);
+				item.ResultType = resultTypes.First(x => x.Id == item.ResultTypeId);
+			}
+			results.Collection = resultSubset;
+			return results;
+		}
+
+		return new PageResult<ResultBase>();
+	}
+
+	public async Task<TranslatorResult?> GetTranslatorAsync(int resultId)
 	{
 		var resultModel = await GetAsync(resultId);
 		if (resultModel != null && resultModel.Id > 0)
 		{
-			var results = await _dataAccess.LoadDataAsync<ResultTranslatorModel, dynamic>("dbo.spResultsTranslator_Get", new { ResultId = resultId });
+			var results = await _dataAccess.LoadDataAsync<TranslatorResult, dynamic>("dbo.spResultsTranslator_Get", new { ResultId = resultId });
 			if (results != null)
 			{
 				var result = results.FirstOrDefault();
@@ -90,12 +132,12 @@ public class ResultData : IResultData
 		return null;
 	}
 
-	public async Task<ResultSpeechModel?> GetSpeechAsync(int resultId)
+	public async Task<SpeechResult?> GetSpeechAsync(int resultId)
 	{
 		var resultModel = await GetAsync(resultId);
 		if (resultModel != null && resultModel.Id > 0)
 		{
-			var results = await _dataAccess.LoadDataAsync<ResultSpeechModel, dynamic>("dbo.spResultsSpeech_Get", new { ResultId = resultId });
+			var results = await _dataAccess.LoadDataAsync<SpeechResult, dynamic>("dbo.spResultsSpeech_Get", new { ResultId = resultId });
 			if (results != null)
 			{
 				var result = results.FirstOrDefault();
@@ -109,12 +151,12 @@ public class ResultData : IResultData
 		return null;
 	}
 
-	public async Task<ResultVisionModel?> GetVisionAsync(int resultId)
+	public async Task<VisionResult?> GetVisionAsync(int resultId)
 	{
 		var resultModel = await GetAsync(resultId);
 		if (resultModel != null && resultModel.Id > 0)
 		{
-			var results = await _dataAccess.LoadDataAsync<ResultVisionModel, dynamic>("dbo.spResultsVision_Get", new { ResultId = resultId });
+			var results = await _dataAccess.LoadDataAsync<VisionResult, dynamic>("dbo.spResultsVision_Get", new { ResultId = resultId });
 			if (results != null)
 			{
 				var result = results.FirstOrDefault();
@@ -128,12 +170,12 @@ public class ResultData : IResultData
 		return null;
 	}
 
-	public async Task<ResultLanguageModel?> GetLanguageAsync(int resultId)
+	public async Task<LanguageResult?> GetLanguageAsync(int resultId)
 	{
 		var resultModel = await GetAsync(resultId);
 		if (resultModel != null && resultModel.Id > 0)
 		{
-			var results = await _dataAccess.LoadDataAsync<ResultLanguageModel, dynamic>("dbo.spResultsLanguage_Get", new { ResultId = resultId });
+			var results = await _dataAccess.LoadDataAsync<LanguageResult, dynamic>("dbo.spResultsLanguage_Get", new { ResultId = resultId });
 			if (results != null)
 			{
 				var result = results.FirstOrDefault();
@@ -147,7 +189,7 @@ public class ResultData : IResultData
 		return null;
 	}
 
-	public async Task<int> InsertAsync(ResultModel item)
+	public async Task<int> InsertAsync(ResultBase item)
 	{
 		var p = new DynamicParameters();
 		p.Add(name: "@ResourceId", item.ResourceId);
@@ -163,7 +205,7 @@ public class ResultData : IResultData
 		return newId.HasValue ? newId.Value : 0;
 	}
 
-	public async Task<int> InsertTranslatorAsync(ResultTranslatorModel item)
+	public async Task<int> InsertTranslatorAsync(TranslatorResult item)
 	{
 		var p = new DynamicParameters();
 		p.Add(name: "@ResultId", item.ResultId);
@@ -184,7 +226,7 @@ public class ResultData : IResultData
 		return newId.HasValue ? newId.Value : 0;
 	}
 
-	public async Task<int> InsertSpeechAsync(ResultSpeechModel item)
+	public async Task<int> InsertSpeechAsync(SpeechResult item)
 	{
 		var p = new DynamicParameters();
 		p.Add(name: "@ResultId", item.ResultId);
@@ -206,7 +248,7 @@ public class ResultData : IResultData
 		return newId.HasValue ? newId.Value : 0;
 	}
 
-	public async Task<int> InsertVisionAsync(ResultVisionModel item)
+	public async Task<int> InsertVisionAsync(VisionResult item)
 	{
 		var p = new DynamicParameters();
 		p.Add(name: "@ResultId", item.ResultId);
@@ -228,7 +270,7 @@ public class ResultData : IResultData
 		return newId.HasValue ? newId.Value : 0;
 	}
 
-	public async Task<int> InsertLanguageAsync(ResultLanguageModel item)
+	public async Task<int> InsertLanguageAsync(LanguageResult item)
 	{
 		var p = new DynamicParameters();
 		p.Add(name: "@ResultId", item.ResultId);
@@ -252,7 +294,7 @@ public class ResultData : IResultData
 		return newId.HasValue ? newId.Value : 0;
 	}
 
-	public int Update(ResultModel item)
+	public int Update(ResultBase item)
 	{
 		return _dataAccess.SaveData<dynamic>("dbo.spResults_Update", new { item.Id, item.ResourceId, item.RequestId, item.ResultTypeId, item.ResultData, item.CompletedDt });
 	}
@@ -264,6 +306,82 @@ public class ResultData : IResultData
 		p.Add(name: "@Output", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
 
 		await _dataAccess.SaveDataAsync("dbo.spResults_Delete", p);
+		var completed = p.Get<int?>("@Output");
+		if (completed.HasValue && completed.Value.Equals(1))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	public async Task<bool> DeleteTranslatorResultAsync(int id, int resultId)
+	{
+		var p = new DynamicParameters();
+		p.Add(name: "@Id", id);
+		p.Add(name: "@ResultId", resultId);
+		p.Add(name: "@Output", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+		await _dataAccess.SaveDataAsync("dbo.spResultsTranslator_Delete", p);
+		var completed = p.Get<int?>("@Output");
+		if (completed.HasValue && completed.Value.Equals(1))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	public async Task<bool> DeleteSpeechResultAsync(int id, int resultId)
+	{
+		var p = new DynamicParameters();
+		p.Add(name: "@Id", id);
+		p.Add(name: "@ResultId", resultId);
+		p.Add(name: "@Output", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+		await _dataAccess.SaveDataAsync("dbo.spResultsSpeech_Delete", p);
+		var completed = p.Get<int?>("@Output");
+		if (completed.HasValue && completed.Value.Equals(1))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	public async Task<bool> DeleteVisionResultAsync(int id, int resultId)
+	{
+		var p = new DynamicParameters();
+		p.Add(name: "@Id", id);
+		p.Add(name: "@ResultId", resultId);
+		p.Add(name: "@Output", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+		await _dataAccess.SaveDataAsync("dbo.spResultsVision_Delete", p);
+		var completed = p.Get<int?>("@Output");
+		if (completed.HasValue && completed.Value.Equals(1))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+
+	public async Task<bool> DeleteLanguageResultAsync(int id, int resultId)
+	{
+		var p = new DynamicParameters();
+		p.Add(name: "@Id", id);
+		p.Add(name: "@ResultId", resultId);
+		p.Add(name: "@Output", dbType: DbType.Int32, direction: ParameterDirection.ReturnValue);
+
+		await _dataAccess.SaveDataAsync("dbo.spResultsLanguage_Delete", p);
 		var completed = p.Get<int?>("@Output");
 		if (completed.HasValue && completed.Value.Equals(1))
 		{

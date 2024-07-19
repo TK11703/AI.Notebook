@@ -116,6 +116,11 @@
     <Build Include="dbo\Stored Procedures\spResultsSpeech_Insert.sql" />
     <Build Include="dbo\Stored Procedures\spResultsVision_Get.sql" />
     <Build Include="dbo\Stored Procedures\spResultsVision_Insert.sql" />
+    <Build Include="dbo\Stored Procedures\spResults_GetPaged.sql" />
+    <Build Include="dbo\Stored Procedures\spResultsTranslator_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\spResultsSpeech_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\spResultsVision_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\spResultsLanguage_Delete.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />

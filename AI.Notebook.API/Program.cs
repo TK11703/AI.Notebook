@@ -1,7 +1,11 @@
 
-using AI.Notebook.API.Routers;
+using AI.Notebook.API.Extensions;
 using AI.Notebook.DataAccess.DBAccess;
 using FluentValidation;
+using Microsoft.AspNetCore.Diagnostics;
+using System.Reflection;
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,14 +26,12 @@ builder.Services.AddScoped<IAIResourceData, AIResourceData>();
 builder.Services.AddScoped<IResultTypeData, ResultTypeData>();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
-// Add "Router" classes as a service
-builder.Services.AddScoped<RouterBase, AIResourceRouter>();
-builder.Services.AddScoped<RouterBase, ResultTypeRouter>();
-builder.Services.AddScoped<RouterBase, RequestRouter>();
-builder.Services.AddScoped<RouterBase, ServicesRouter>();
-builder.Services.AddScoped<RouterBase, ResultRouter>();
+//Registers the endpoints that implement the IEndpoint interface
+builder.Services.AddEndpoints(Assembly.GetExecutingAssembly());
 
 var app = builder.Build();
+
+var logger = app.Services.GetService<ILogger<Program>>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -40,23 +42,33 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseExceptionHandler(appError =>
+{
+	appError.Run(async context =>
+	{
+		context.Response.StatusCode = 500;
+		context.Response.ContentType = "application/json";
+		var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
+		if (contextFeature is not null)
+		{
+			//log the error
+			string error = $"Error: {contextFeature.Error}";
+			if (logger is not null)
+			{
+				logger.LogError(error);
+			}
+			await context.Response.WriteAsJsonAsync(new
+			{
+				StatusCode = context.Response.StatusCode,
+				Message = "Internal Server Error."
+			});
+		}
+	});
+});
+
 app.UseAuthorization();
 
-//*************************************
-// Add Routes from all "Router Classes"
-//*************************************
-using (var scope = app.Services.CreateScope())
-{
-	// Build collection of all RouterBase classes
-	var services = scope.ServiceProvider.GetServices<RouterBase>();
+//Register the endpoint as services in the application for use.
+app.MapEndpoints();
 
-	// Loop through each RouterBase class
-	foreach (var item in services)
-	{
-		// Invoke the AddRoutes() method to add the routes
-		item.AddRoutes(app);
-	}
-
-	// Make sure this is called within the application scope
-	app.Run();
-}
+app.Run();

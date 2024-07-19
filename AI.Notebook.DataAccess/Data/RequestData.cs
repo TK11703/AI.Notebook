@@ -1,5 +1,5 @@
 ﻿using AI.Notebook.DataAccess.DBAccess;
-using AI.Notebook.Common.Models;
+using AI.Notebook.Common.Entities;
 using Dapper;
 using System.Data;
 
@@ -13,13 +13,13 @@ public class RequestData : IRequestData
 		_dataAccess = dataAccess;
 	}
 
-	public async Task<IEnumerable<RequestModel>> GetAllAsync()
+	public async Task<IEnumerable<RequestBase>> GetAllAsync()
 	{
-		var requests = await _dataAccess.LoadDataAsync<RequestModel, dynamic>("dbo.spRequests_GetAll", new { });
+		var requests = await _dataAccess.LoadDataAsync<RequestBase, dynamic>("dbo.spRequests_GetAll", new { });
 		if (requests != null)
 		{
 			AIResourceData aiResourceDataItems = new AIResourceData(_dataAccess);
-			IEnumerable<AIResourceModel> aiResources = await aiResourceDataItems.GetAllAsync();
+			IEnumerable<AIResource> aiResources = await aiResourceDataItems.GetAllAsync();
 			foreach (var request in requests)
 			{
 				request.AIResource = aiResources.First(x => x.Id == request.ResourceId);
@@ -27,12 +27,12 @@ public class RequestData : IRequestData
 			return requests;
 		}
 
-		return Enumerable.Empty<RequestModel>();
+		return Enumerable.Empty<RequestBase>();
 	}
 
-	public async Task<PageResultModel<RequestModel>> GetPagedAsync(PageSubmissionModel pageRequest)
+	public async Task<PageResult<RequestBase>> GetPagedAsync(PageRequest pageRequest)
 	{
-		PageResultModel<RequestModel> results = new PageResultModel<RequestModel>(pageRequest.PageSize, pageRequest.Start);
+		PageResult<RequestBase> results = new PageResult<RequestBase>(pageRequest.PageSize, pageRequest.Start);
 		var p = new DynamicParameters();
 		p.Add(name: "@SortBy", pageRequest.SortBy);
 		p.Add(name: "@SortOrder", pageRequest.SortDirection);
@@ -52,12 +52,12 @@ public class RequestData : IRequestData
 			p.Add(name: "@End", pageRequest.EndDate.Value.Date);
 		}
 		p.Add(name: "@Total", value: 0, dbType: DbType.Int32, direction: ParameterDirection.Output);
-		var requests = await _dataAccess.LoadDataAsync<RequestModel, dynamic>("dbo.spRequests_GetPaged", p);
+		var requests = await _dataAccess.LoadDataAsync<RequestBase, dynamic>("dbo.spRequests_GetPaged", p);
 		if(requests != null)
 		{
 			results.ItemCount = p.Get<int>("@Total");
 			AIResourceData aiResourceDataItems = new AIResourceData(_dataAccess);
-			IEnumerable<AIResourceModel> aiResources = await aiResourceDataItems.GetAllAsync();
+			IEnumerable<AIResource> aiResources = await aiResourceDataItems.GetAllAsync();
 			foreach(var request in requests)
 			{
 				request.AIResource = aiResources.First(x=>x.Id == request.ResourceId);
@@ -66,12 +66,12 @@ public class RequestData : IRequestData
 			return results;
 		}
 		
-		return new PageResultModel<RequestModel>();
+		return new PageResult<RequestBase>();
 	}
 
-	public async Task<RequestModel?> GetAsync(int id)
+	public async Task<RequestBase?> GetAsync(int id)
 	{
-		var results = await _dataAccess.LoadDataAsync<RequestModel, dynamic>("dbo.spRequests_Get", new { Id = id });
+		var results = await _dataAccess.LoadDataAsync<RequestBase, dynamic>("dbo.spRequests_Get", new { Id = id });
 		if (results != null)
 		{
 			var request = results.FirstOrDefault();
@@ -85,12 +85,12 @@ public class RequestData : IRequestData
 		return null;
 	}
 
-	public async Task<RequestTranslatorModel?> GetTranslatorAsync(int requestId)
+	public async Task<TranslatorRequest?> GetTranslatorAsync(int requestId)
 	{
 		var requestModel = await GetAsync(requestId);
 		if (requestModel != null && requestModel.Id > 0)
 		{
-			var results = await _dataAccess.LoadDataAsync<RequestTranslatorModel, dynamic>("dbo.spRequestsTranslator_Get", new { RequestId = requestId });
+			var results = await _dataAccess.LoadDataAsync<TranslatorRequest, dynamic>("dbo.spRequestsTranslator_Get", new { RequestId = requestId });
 			if (results != null)
 			{
 				var request = results.FirstOrDefault();
@@ -106,12 +106,12 @@ public class RequestData : IRequestData
 		return null;
 	}
 
-	public async Task<RequestSpeechModel?> GetSpeechAsync(int requestId)
+	public async Task<SpeechRequest?> GetSpeechAsync(int requestId)
 	{
 		var requestModel = await GetAsync(requestId);
 		if (requestModel != null && requestModel.Id > 0)
 		{
-			var results = await _dataAccess.LoadDataAsync<RequestSpeechModel, dynamic>("dbo.spRequestsSpeech_Get", new { RequestId = requestId });
+			var results = await _dataAccess.LoadDataAsync<SpeechRequest, dynamic>("dbo.spRequestsSpeech_Get", new { RequestId = requestId });
 			if (results != null)
 			{
 				var request = results.FirstOrDefault();
@@ -127,12 +127,12 @@ public class RequestData : IRequestData
 		return null;
 	}
 
-	public async Task<RequestVisionModel?> GetVisionAsync(int requestId)
+	public async Task<VisionRequest?> GetVisionAsync(int requestId)
 	{
 		var requestModel = await GetAsync(requestId);
 		if (requestModel != null && requestModel.Id > 0)
 		{
-			var results = await _dataAccess.LoadDataAsync<RequestVisionModel, dynamic>("dbo.spRequestsVision_Get", new { RequestId = requestId });
+			var results = await _dataAccess.LoadDataAsync<VisionRequest, dynamic>("dbo.spRequestsVision_Get", new { RequestId = requestId });
 			if (results != null)
 			{
 				var request = results.FirstOrDefault();
@@ -148,12 +148,12 @@ public class RequestData : IRequestData
 		return null;
 	}
 
-	public async Task<RequestLanguageModel?> GetLanguageAsync(int requestId)
+	public async Task<LanguageRequest?> GetLanguageAsync(int requestId)
 	{
 		var requestModel = await GetAsync(requestId);
 		if (requestModel != null && requestModel.Id > 0)
 		{
-			var results = await _dataAccess.LoadDataAsync<RequestLanguageModel, dynamic>("dbo.spRequestsLanguage_Get", new { RequestId = requestId });
+			var results = await _dataAccess.LoadDataAsync<LanguageRequest, dynamic>("dbo.spRequestsLanguage_Get", new { RequestId = requestId });
 			if (results != null)
 			{
 				var request = results.FirstOrDefault();
@@ -169,7 +169,7 @@ public class RequestData : IRequestData
 		return null;
 	}
 
-	public async Task<int> InsertAsync(RequestModel item)
+	public async Task<int> InsertAsync(RequestBase item)
 	{
 		var p = new DynamicParameters();
 		p.Add(name: "@ResourceId", item.ResourceId);
@@ -182,7 +182,7 @@ public class RequestData : IRequestData
 		return newId.HasValue ? newId.Value : 0;
 	}
 
-	public async Task<int> InsertTranslatorAsync(RequestTranslatorModel item)
+	public async Task<int> InsertTranslatorAsync(TranslatorRequest item)
 	{
 		var p = new DynamicParameters();
 		p.Add(name: "@RequestId", item.RequestId);
@@ -194,7 +194,7 @@ public class RequestData : IRequestData
 		return newId.HasValue ? newId.Value : 0;
 	}
 
-	public async Task<int> InsertSpeechAsync(RequestSpeechModel item)
+	public async Task<int> InsertSpeechAsync(SpeechRequest item)
 	{
 		var p = new DynamicParameters();
 		p.Add(name: "@RequestId", item.RequestId);
@@ -206,7 +206,7 @@ public class RequestData : IRequestData
 		return newId.HasValue ? newId.Value : 0;
 	}
 
-	public async Task<int> InsertVisionAsync(RequestVisionModel item)
+	public async Task<int> InsertVisionAsync(VisionRequest item)
 	{
 		var p = new DynamicParameters();
 		p.Add(name: "@RequestId", item.RequestId);
@@ -218,7 +218,7 @@ public class RequestData : IRequestData
 		return newId.HasValue ? newId.Value : 0;
 	}
 
-	public async Task<int> InsertLanguageAsync(RequestLanguageModel item)
+	public async Task<int> InsertLanguageAsync(LanguageRequest item)
 	{
 		var p = new DynamicParameters();
 		p.Add(name: "@RequestId", item.RequestId);
@@ -230,30 +230,30 @@ public class RequestData : IRequestData
 		return newId.HasValue ? newId.Value : 0;
 	}
 
-	public int Update(RequestModel item)
+	public int Update(RequestBase item)
 	{
 		return _dataAccess.SaveData<dynamic>("dbo.spRequests_Update", new { item.Id, item.ResourceId, item.Name});
 	}
 
-	public int UpdateTranslator(RequestTranslatorModel item)
+	public int UpdateTranslator(TranslatorRequest item)
 	{
 		dynamic parameters = new { item.Name, item.RequestId, item.SourceLangCode, item.TargetLangCode, item.Input, item.Translate, item.Transliterate, item.OutputAsAudio, item.Ssml, item.SsmlUrl, item.VoiceName };
 		return _dataAccess.SaveData<dynamic>("dbo.spRequestsTranslator_Update", parameters);
 	}
 
-	public int UpdateSpeech(RequestSpeechModel item)
+	public int UpdateSpeech(SpeechRequest item)
 	{
 		dynamic parameters = new { item.Name, item.RequestId, item.SourceLangCode, item.TargetLangCode, item.AudioData, item.AudioUrl, item.Ssml, item.SsmlUrl, item.OutputAsAudio, item.VoiceName, item.Translate, item.Transcribe };
 		return _dataAccess.SaveData<dynamic>("dbo.spRequestsSpeech_Update", parameters);
 	}
 
-	public int UpdateVision(RequestVisionModel item)
+	public int UpdateVision(VisionRequest item)
 	{
 		dynamic parameters = new { item.Name, item.RequestId, item.ImageData, item.ImageUrl, item.GenderNeutralCaption, item.Caption, item.DenseCaptions, item.Tags, item.ObjectDetection, item.People, item.SmartCrop, item.Ocr };
 		return _dataAccess.SaveData<dynamic>("dbo.spRequestsVision_Update", parameters);
 	}
 
-	public int UpdateLanguage(RequestLanguageModel item)
+	public int UpdateLanguage(LanguageRequest item)
 	{
 		dynamic parameters = new { item.Name, item.RequestId, item.SourceLangCode, item.TargetLangCode, item.Input, item.Language, item.Sentiment, item.KeyPhrases, item.Entities, item.PiiEntites, item.LinkedEntities, item.NamedEntityRecognition, item.Summary, item.AbstractiveSummary };
 		return _dataAccess.SaveData<dynamic>("dbo.spRequestsLanguage_Update", parameters);

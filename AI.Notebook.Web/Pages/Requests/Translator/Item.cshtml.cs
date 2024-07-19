@@ -1,5 +1,5 @@
 using AI.Notebook.Common.AI.Text;
-using AI.Notebook.Common.Models;
+using AI.Notebook.Common.Entities;
 using AI.Notebook.Web.Clients;
 using AI.Notebook.Web.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -9,21 +9,21 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AI.Notebook.Web.Pages.Requests.Translator
 {
-    public class ItemModel : PageModel
+	public class ItemModel : PageModel
     {
-		private readonly AIResourceClient _resourceClient;
-		private readonly RequestClient _requestClient;
-		private readonly ResultClient _resultClient;
-		private readonly ServicesClient _servicesClient;
+		private readonly AIResourcesClient _resourceClient;
+		private readonly RequestsClient _requestClient;
+		private readonly ResultsClient _resultClient;
+		private readonly TranslatorClient _translatorClient;
 		private readonly ILogger<ItemModel> _logger;
-		public ItemModel(AIResourceClient resourceClient, ILogger<ItemModel> logger, RequestClient requestClient, ResultClient resultClient, ServicesClient servicesClient)
+		public ItemModel(AIResourcesClient resourceClient, ILogger<ItemModel> logger, RequestsClient requestClient, ResultsClient resultClient, TranslatorClient translatorClient)
 		{
 			_resourceClient = resourceClient;
 			_logger = logger;			
 			_requestClient = requestClient;
 			_resultClient = resultClient;
-			_servicesClient = servicesClient;
-			RequestFormModel = new TranslatorModel();
+			_translatorClient = translatorClient;
+			RequestFormModel = new TranslatorRequestModel();
 		}
 
 		[FromRoute]
@@ -38,9 +38,9 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 		[Display(Name = "Target Language")]
 		public SelectList? TargetLanguageList { get; set; }
 
-		public IEnumerable<ResultModel> Results { get; set; } = null!;
+		public IEnumerable<ResultBase> Results { get; set; } = null!;
 
-		public TranslatorModel RequestFormModel { get; set; }
+		public TranslatorRequestModel RequestFormModel { get; set; }
 
 		public async Task<IActionResult> OnGetAsync()
 		{
@@ -49,10 +49,10 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 			{
 				try
 				{
-					var requestModel = await _requestClient.GetTranslatorModel(Id);
+					var requestModel = await _translatorClient.GetTranslatorRequest(Id);
 					if(requestModel != null)
 					{
-						RequestFormModel = new TranslatorModel()
+						RequestFormModel = new TranslatorRequestModel()
 						{
 							Id = requestModel.Id,
 							Name = requestModel.Name,
@@ -88,11 +88,11 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 			return Page();
 		}
 
-		public async Task<IActionResult> OnPostSaveAsync(TranslatorModel RequestFormModel)
+		public async Task<IActionResult> OnPostSaveAsync(TranslatorRequestModel RequestFormModel)
 		{
 			if (RequestFormModel != null && ModelState.IsValid)
 			{
-				RequestTranslatorModel item = new RequestTranslatorModel()
+				TranslatorRequest item = new TranslatorRequest()
 				{
 					Id = RequestFormModel.Id,
 					RequestId = RequestFormModel.Id,
@@ -112,7 +112,7 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 				{
 					if (item.Id > 0)
 					{
-						await _requestClient.Update(item);
+						await _translatorClient.Update(item);
 						HttpContext.Session.SetString("Notification", $"The Request was updated successfully.");
 						return RedirectToPage();
 					}
@@ -137,11 +137,11 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 			}
 		}
 
-		public async Task<IActionResult> OnPostExecuteAsync(TranslatorModel RequestFormModel)
+		public async Task<IActionResult> OnPostExecuteAsync(TranslatorRequestModel RequestFormModel)
 		{
 			if (RequestFormModel != null && ModelState.IsValid)
 			{
-				RequestTranslatorModel item = new RequestTranslatorModel()
+				TranslatorRequest item = new TranslatorRequest()
 				{
 					Id = RequestFormModel.Id,
 					RequestId = RequestFormModel.Id,
@@ -163,11 +163,11 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 					{
 						if (item.Translate)
 						{
-							await _servicesClient.Translate(item);
+							await _translatorClient.Translate(item);
 						}
 						else
 						{
-							await _servicesClient.Transliterate(item);
+							await _translatorClient.Transliterate(item);
 						}
 						
 						HttpContext.Session.SetString("Notification", $"The request was executed successfully.");
@@ -227,7 +227,7 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 				AIResourceList = CreateSelectList(AIResources, x => x.Id, x => x.Name);
 			}
 
-			SupportedLanguagesResult? langResult = await _servicesClient.GetTranslatorLanguages();
+			SupportedLanguagesResult? langResult = await _translatorClient.GetTranslatorLanguages();
 			if (langResult != null && langResult.SupportedLanguages != null)
 			{
 				SourceLanguageList = CreateSelectList(langResult.SupportedLanguages, x => x.Key, x => x.Name);
@@ -251,7 +251,7 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 			return new SelectList(options, "Value", "Text");
 		}
 
-		private bool IsValid(RequestTranslatorModel item)
+		private bool IsValid(TranslatorRequest item)
 		{
 			bool isValid = true;
 

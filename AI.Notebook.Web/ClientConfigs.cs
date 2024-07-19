@@ -12,7 +12,7 @@ public static class ClientConfigs
 	/// <param name="config"></param>
 	public static void ConfigureClients(this IServiceCollection services, ConfigurationManager config)
 	{
-		services.AddHttpClient<RequestClient>(client =>
+		services.AddHttpClient<RequestsClient>(client =>
 		{
 			client.BaseAddress = new Uri(config.GetValue<string>("Clients:RequestsBaseUri"));
 		})
@@ -25,7 +25,7 @@ public static class ClientConfigs
 		})
 		.SetHandlerLifetime(Timeout.InfiniteTimeSpan);
 
-		services.AddHttpClient<ResultClient>(client =>
+		services.AddHttpClient<ResultsClient>(client =>
 		{
 			client.BaseAddress = new Uri(config.GetValue<string>("Clients:ResultsBaseUri"));
 		})
@@ -38,7 +38,7 @@ public static class ClientConfigs
 		})
 		.SetHandlerLifetime(Timeout.InfiniteTimeSpan);
 
-		services.AddHttpClient<AIResourceClient>(client =>
+		services.AddHttpClient<AIResourcesClient>(client =>
 		{
 			client.BaseAddress = new Uri(config.GetValue<string>("Clients:AIResourcesBaseUri"));
 		})
@@ -51,7 +51,7 @@ public static class ClientConfigs
 		})
 		.SetHandlerLifetime(Timeout.InfiniteTimeSpan);
 
-		services.AddHttpClient<ResultTypeClient>(client =>
+		services.AddHttpClient<ResultTypesClient>(client =>
 		{
 			client.BaseAddress = new Uri(config.GetValue<string>("Clients:ResultTypesBaseUri"));
 		})
@@ -64,9 +64,48 @@ public static class ClientConfigs
 		})
 		.SetHandlerLifetime(Timeout.InfiniteTimeSpan);
 
-		services.AddHttpClient<ServicesClient>(client =>
+		services.AddHttpClient<SpeechClient>(client =>
 		{
-			client.BaseAddress = new Uri(config.GetValue<string>("Clients:ServicesBaseUri"));
+			client.BaseAddress = new Uri(config.GetValue<string>("Clients:SpeechBaseUri"));
+		})
+		.ConfigurePrimaryHttpMessageHandler(() =>
+		{
+			return new SocketsHttpHandler
+			{
+				PooledConnectionLifetime = TimeSpan.FromMinutes(5)
+			};
+		})
+		.SetHandlerLifetime(Timeout.InfiniteTimeSpan);
+
+		services.AddHttpClient<LanguageClient>(client =>
+		{
+			client.BaseAddress = new Uri(config.GetValue<string>("Clients:LanguageBaseUri"));
+		})
+		.ConfigurePrimaryHttpMessageHandler(() =>
+		{
+			return new SocketsHttpHandler
+			{
+				PooledConnectionLifetime = TimeSpan.FromMinutes(5)
+			};
+		})
+		.SetHandlerLifetime(Timeout.InfiniteTimeSpan);
+
+		services.AddHttpClient<VisionClient>(client =>
+		{
+			client.BaseAddress = new Uri(config.GetValue<string>("Clients:VisionBaseUri"));
+		})
+		.ConfigurePrimaryHttpMessageHandler(() =>
+		{
+			return new SocketsHttpHandler
+			{
+				PooledConnectionLifetime = TimeSpan.FromMinutes(5)
+			};
+		})
+		.SetHandlerLifetime(Timeout.InfiniteTimeSpan);
+
+		services.AddHttpClient<TranslatorClient>(client =>
+		{
+			client.BaseAddress = new Uri(config.GetValue<string>("Clients:TranslatorBaseUri"));
 		})
 		.ConfigurePrimaryHttpMessageHandler(() =>
 		{

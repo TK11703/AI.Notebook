@@ -1,4 +1,4 @@
-using AI.Notebook.Common.Models;
+using AI.Notebook.Common.Entities;
 using AI.Notebook.Web.Clients;
 using AI.Notebook.Web.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -8,13 +8,13 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AI.Notebook.Web.Pages
 {
-    public class SettingsModel : PageModel
+	public class SettingsModel : PageModel
     {
-		private readonly AIResourceClient _resourceClient;
-		private readonly ResultTypeClient _resultTypeClient;
+		private readonly AIResourcesClient _resourceClient;
+		private readonly ResultTypesClient _resultTypeClient;
 		private readonly ILogger<SettingsModel> _logger;
 
-		public SettingsModel(AIResourceClient resourceClient, ResultTypeClient resultTypeClient, ILogger<SettingsModel> logger)
+		public SettingsModel(AIResourcesClient resourceClient, ResultTypesClient resultTypeClient, ILogger<SettingsModel> logger)
 		{
 			_resourceClient = resourceClient;
 			_resultTypeClient = resultTypeClient;
@@ -23,9 +23,9 @@ namespace AI.Notebook.Web.Pages
 			_logger = logger;
 		}
 
-		public IEnumerable<AIResourceModel> AIResources { get; set; } = null!;
+		public IEnumerable<AIResource> AIResources { get; set; } = null!;
 
-		public IEnumerable<ResultTypeModel> ResultTypes { get; set; } = null!;
+		public IEnumerable<ResultType> ResultTypes { get; set; } = null!;
 
 		[Display(Name = "AI Resource List")]
 		public SelectList AIResourceList { get; set; } = null!;
@@ -57,7 +57,7 @@ namespace AI.Notebook.Web.Pages
 		{
 			if (AIResourceFormModel != null && AIResourceFormModel.IsValid())
 			{
-				AIResourceModel item = new AIResourceModel()
+				AIResource item = new AIResource()
 				{
 					Id = AIResourceFormModel.Id,
 					Name = AIResourceFormModel.Name,
@@ -122,7 +122,7 @@ namespace AI.Notebook.Web.Pages
 		{
 			if (ResultTypeFormModel != null && ResultTypeFormModel.IsValid())
 			{
-				ResultTypeModel item = new ResultTypeModel()
+				ResultType item = new ResultType()
 				{
 					Id = ResultTypeFormModel.Id,
 					Name = ResultTypeFormModel.Name,

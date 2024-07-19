@@ -1,7 +1,7 @@
 ﻿using AI.Notebook.DataAccess.DBAccess;
-using AI.Notebook.Common.Models;
 using Dapper;
 using System.Data;
+using AI.Notebook.Common.Entities;
 
 namespace AI.Notebook.DataAccess.Data;
 public class ResultTypeData : IResultTypeData
@@ -13,26 +13,26 @@ public class ResultTypeData : IResultTypeData
 		_dataAccess = dataAccess;
 	}
 
-	public async Task<IEnumerable<ResultTypeModel>> GetAllAsync()
+	public async Task<IEnumerable<ResultType>> GetAllAsync()
 	{
-		return await _dataAccess.LoadDataAsync<ResultTypeModel, dynamic>("dbo.spResultTypes_GetAll", new { });
+		return await _dataAccess.LoadDataAsync<ResultType, dynamic>("dbo.spResultTypes_GetAll", new { });
 	}
 
-	public async Task<ResultTypeModel?> GetAsync(int id)
+	public async Task<ResultType?> GetAsync(int id)
 	{
-		var results = await _dataAccess.LoadDataAsync<ResultTypeModel, dynamic>("dbo.spResultTypes_Get", new { Id = id });
+		var results = await _dataAccess.LoadDataAsync<ResultType, dynamic>("dbo.spResultTypes_Get", new { Id = id });
 
 		return results.FirstOrDefault();
 	}
 
-	public async Task<ResultTypeModel?> GetByNameAsync(string name)
+	public async Task<ResultType?> GetByNameAsync(string name)
 	{
-		var results = await _dataAccess.LoadDataAsync<ResultTypeModel, dynamic>("dbo.spResultTypes_GetByName", new { Name = name });
+		var results = await _dataAccess.LoadDataAsync<ResultType, dynamic>("dbo.spResultTypes_GetByName", new { Name = name });
 
 		return results.FirstOrDefault();
 	}
 
-	public async Task<int> InsertAsync(ResultTypeModel item)
+	public async Task<int> InsertAsync(ResultType item)
 	{
 		var p = new DynamicParameters();		
 		p.Add(name: "@Name", item.Name);
@@ -46,7 +46,7 @@ public class ResultTypeData : IResultTypeData
 		return newId.HasValue ? newId.Value : 0;
 	}
 
-	public int Update(ResultTypeModel item)
+	public int Update(ResultType item)
 	{
 		return _dataAccess.SaveData<dynamic>("dbo.spResultTypes_Update", new { item.Id, item.Name, item.Description, item.Active });
 	}

@@ -8,15 +8,15 @@ public class TextTranslationServices
 	private readonly TextTranslationClient _translationClient;
 	private readonly SpeechConfig _speechConfig;
 
-	public TextTranslationServices(string serviceKey, string serviceRegion)
+	public TextTranslationServices(string subscriptionKey, string translationServiceKey, string serviceRegion, string speechServiceKey)
 	{
-		_translationClient = new TextTranslationClient(new AzureKeyCredential(serviceKey), serviceRegion);
-		_speechConfig = SpeechConfig.FromSubscription(serviceKey, serviceRegion);
+		_translationClient = new TextTranslationClient(new AzureKeyCredential(translationServiceKey), serviceRegion);
+		_speechConfig = SpeechConfig.FromSubscription(speechServiceKey, serviceRegion);
 	}
 
 	public async Task<SupportedLanguagesResult> GetSupportedLanguages(string? scope = null)
 	{
-		GetLanguagesResult response = await _translationClient.GetLanguagesAsync(scope:scope);
+		GetSupportedLanguagesResult response = await _translationClient.GetSupportedLanguagesAsync(scope:scope);
 		SupportedLanguagesResult result = new SupportedLanguagesResult() {
 			TranslationLanguages = response.Translation.Count,
 			TransliterationLanguages = response.Transliteration.Count,
@@ -82,12 +82,12 @@ public class TextTranslationServices
 		byte[]? audioOutput = null;
 		if (outputAsAudio)
 		{
-			audioOutput = await GenerateAudio(translation?.Translations?[0]?.Text);
+			audioOutput = await GenerateAudio(translation?.Translations?[0]?.Text, voiceName);
 		}
 		return new TextTranslationResult()
 		{
 			SourceLanguageCode = translation?.DetectedLanguage?.Language,
-			TargetLanguage = translation?.Translations[0].To,
+			TargetLanguage = translation?.Translations[0].TargetLanguage,
 			TargetLanguageCode = targetLangCode,
 			Input = input,
 			Output = translation?.Translations?[0]?.Text,
@@ -109,7 +109,7 @@ public class TextTranslationServices
 		{
 			SourceLanguage = translation?.DetectedLanguage?.Language,
 			SourceLanguageCode = sourceLangCode,
-			TargetLanguage = translation?.Translations[0].To,
+			TargetLanguage = translation?.Translations[0].TargetLanguage,
 			TargetLanguageCode = targetLangCode,
 			Input = input,
 			Output = translation?.Translations?[0]?.Text,
@@ -117,7 +117,7 @@ public class TextTranslationServices
 		};
 	}
 
-	private async Task<byte[]?> GenerateAudio(string? textToSpeak, string? voiceName = null)
+	private async Task<byte[]?> GenerateAudio(string? textToSpeak, string? voiceName)
 	{
 		if (!string.IsNullOrEmpty(textToSpeak))
 		{
@@ -129,11 +129,49 @@ public class TextTranslationServices
 			{
 				_speechConfig.SpeechSynthesisVoiceName = "en-GB-RyanNeural";
 			}			
-			using SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer(_speechConfig);
+			using SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer(_speechConfig, null);
 			SpeechSynthesisResult result = await speechSynthesizer.SpeakTextAsync(textToSpeak);
-			if (result.Reason != ResultReason.SynthesizingAudioCompleted)
+			if (result.Reason == ResultReason.SynthesizingAudioCompleted)
 			{
 				return result.AudioData;
+			}
+			if (result.Reason == ResultReason.Canceled)
+			{
+				var cancellation = SpeechSynthesisCancellationDetails.FromResult(result);
+				Console.WriteLine($"CANCELED: Reason={cancellation.Reason}");
+
+				if (cancellation.Reason == CancellationReason.Error)
+				{
+					Console.WriteLine($"CANCELED: ErrorCode={cancellation.ErrorCode}");
+					Console.WriteLine($"CANCELED: ErrorDetails=[{cancellation.ErrorDetails}]");
+					Console.WriteLine($"CANCELED: Did you set the speech resource key and region values?");
+				}
+			}
+		}
+		return null;
+	}
+
+	private async Task<byte[]?> GenerateAudio(string ssml)
+	{
+		if (!string.IsNullOrEmpty(ssml))
+		{
+			using SpeechSynthesizer speechSynthesizer = new SpeechSynthesizer(_speechConfig, null);
+			SpeechSynthesisResult result = await speechSynthesizer.SpeakSsmlAsync(ssml);
+			if (result.Reason == ResultReason.SynthesizingAudioCompleted)
+			{
+				return result.AudioData;
+			}
+			if (result.Reason == ResultReason.Canceled)
+			{
+				var cancellation = SpeechSynthesisCancellationDetails.FromResult(result);
+				Console.WriteLine($"CANCELED: Reason={cancellation.Reason}");
+
+				if (cancellation.Reason == CancellationReason.Error)
+				{
+					Console.WriteLine($"CANCELED: ErrorCode={cancellation.ErrorCode}");
+					Console.WriteLine($"CANCELED: ErrorDetails=[{cancellation.ErrorDetails}]");
+					Console.WriteLine($"CANCELED: Did you set the speech resource key and region values?");
+				}
 			}
 		}
 		return null;

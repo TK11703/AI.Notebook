@@ -1,8 +1,9 @@
-﻿using FluentValidation;
+﻿using AI.Notebook.Common.Entities;
+using FluentValidation;
 
 namespace AI.Notebook.API.Validation;
 
-public class ResultModelValidator : AbstractValidator<ResultModel>
+public class ResultModelValidator : AbstractValidator<ResultBase>
 {
 	public ResultModelValidator()
 	{

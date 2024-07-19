@@ -1,0 +1,63 @@
+﻿@model AI.Notebook.Web.Models.TranslatorResultModel
+@{
+	if (Model == null || Model.ResultType == null || string.IsNullOrEmpty(Model.ResultType.Name))
+	{
+		<div class="alert alert-danger" role="alert">
+			The object or properties needed to display this result were missing from the request. Please try again.
+		</div>
+	}
+
+	bool isText = Model.ResultType.Name.ToLower().Equals("plain text");
+	bool isLink = Model.ResultType.Name.ToLower().Equals("url");
+	bool isJSON = Model.ResultType.Name.ToLower().Equals("json");
+	bool isAudio = Model.ResultType.Name.ToLower().Equals("binary/audio");
+	bool isImage = Model.ResultType.Name.ToLower().Equals("binary/image");
+	bool isVideo = Model.ResultType.Name.ToLower().Equals("binary/video");
+}
+
+@if (isText || isJSON)
+{
+	<label asp-for="ResultData" class="form-label"></label>
+	<textarea class="form-control" readonly>@(System.Text.Encoding.Default.GetString(Model.ResultData))</textarea>
+}
+
+@if (isLink)
+{
+	<label asp-for="ResultData" class="form-label"></label>
+	<a href="@(Model.ResultData)" target="_blank" title="Click to view this generated item.">@Model.ResultData</a>
+}
+
+@if (isImage)
+{
+	<label asp-for="ResultData" class="form-label"></label>
+	<img src="@(Model.ResultData)" class="img-fluid" alt="Generated Image" />
+}
+
+@if (isAudio)
+{
+	<label asp-for="ResultData" class="form-label"></label>
+	<div class="d-flex align-items-center">
+		<audio controls>
+			<source src="/Downloads/Audio/@(Model.ResultId)" type="audio/wav">
+			Your browser does not support the audio element.
+		</audio>
+		<a href="/Downloads/Audio/@(Model.ResultId)" class="btn btn-sm btn-outline-secondary ms-2" target="_blank" title="Click to download the generated audio.">
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+				<path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+				<path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z" />
+			</svg>
+		</a>
+	</div>
+	
+}
+
+@if (isVideo)
+{
+	<label asp-for="ResultData" class="form-label"></label>
+	<a href="/Downloads/Video/@(Model.ResultId)" class="btn btn-sm btn-outline-secondary" target="_blank" title="Click to download the generated video.">
+		<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+			<path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+			<path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z" />
+		</svg>
+	</a>
+}

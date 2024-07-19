@@ -1,4 +1,4 @@
-using AI.Notebook.Common.Models;
+using AI.Notebook.Common.Entities;
 using AI.Notebook.Web.Clients;
 using AI.Notebook.Web.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -9,19 +9,19 @@ using System.Reflection;
 
 namespace AI.Notebook.Web.Pages.Requests
 {
-    public class IndexModel : PageModel
+	public class IndexModel : PageModel
     {
-		private readonly AIResourceClient _resourceClient;
-		private readonly RequestClient _requestClient;
+		private readonly AIResourcesClient _resourceClient;
+		private readonly RequestsClient _requestClient;
 		private readonly ILogger<IndexModel> _logger;
 
-		public IndexModel(ILogger<IndexModel> logger, RequestClient requestClient, AIResourceClient resourceClient)
+		public IndexModel(ILogger<IndexModel> logger, RequestsClient requestClient, AIResourcesClient resourceClient)
 		{
 			_logger = logger;
 			_requestClient = requestClient;
 			_resourceClient = resourceClient;
-			PageResult = new PageResultModel<RequestModel>(CurrentPage, 0);
-			PageSubmission = new PageSubmissionModel();
+			PageResult = new PageResult<RequestBase>(CurrentPage, 0);
+			PageSubmission = new PageRequest();
 			RequestFormModel = new RequestNewModel();
 		}
 
@@ -29,12 +29,12 @@ namespace AI.Notebook.Web.Pages.Requests
 		public int CurrentPage { get; set; } = 1;
 
 		[BindProperty]
-		public PageSubmissionModel PageSubmission { get; set; }
+		public PageRequest PageSubmission { get; set; }
 
 		[BindProperty]
-		public PageResultModel<RequestModel> PageResult { get; set; }
+		public PageResult<RequestBase> PageResult { get; set; }
 
-		public IEnumerable<AIResourceModel> AIResources { get; set; } = null!;
+		public IEnumerable<AIResource> AIResources { get; set; } = null!;
 
 		[Display(Name = "AI Resource List")]
 		public SelectList AIResourceList { get; set; } = null!;
@@ -53,7 +53,7 @@ namespace AI.Notebook.Web.Pages.Requests
 			try
 			{
 				PageResult = await _requestClient.GetAll(PageSubmission);
-				foreach (RequestModel model in PageResult.Collection)
+				foreach (RequestBase model in PageResult.Collection)
 				{
 					model.ItemUrlPath = $"{await DetermineRedirectPath(model)}/{model.Id}";
 				}
@@ -65,7 +65,7 @@ namespace AI.Notebook.Web.Pages.Requests
 			}
 			if (PageResult == null)
 			{
-				PageResult = new PageResultModel<RequestModel>(PageSubmission.PageSize, PageSubmission.Start);
+				PageResult = new PageResult<RequestBase>(PageSubmission.PageSize, PageSubmission.Start);
 			}
 		}
 
@@ -80,7 +80,7 @@ namespace AI.Notebook.Web.Pages.Requests
 			try
 			{
 				PageResult = await _requestClient.GetAll(PageSubmission);
-				foreach(RequestModel model in PageResult.Collection)
+				foreach(RequestBase model in PageResult.Collection)
 				{
 					model.ItemUrlPath = $"{await DetermineRedirectPath(model)}/{model.Id}";
 				}
@@ -92,7 +92,7 @@ namespace AI.Notebook.Web.Pages.Requests
 			}
 			if (PageResult == null)
 			{
-				PageResult = new PageResultModel<RequestModel>(PageSubmission.PageSize, PageSubmission.Start);
+				PageResult = new PageResult<RequestBase>(PageSubmission.PageSize, PageSubmission.Start);
 			}
 			return Page();
 		}
@@ -144,13 +144,13 @@ namespace AI.Notebook.Web.Pages.Requests
 				switch (aiResourceModel.Name.ToLower())
 				{
 					case "speech service":
-						model = new RequestSpeechModel() { Name = name, ResourceId=resourceId  }; break;
+						model = new SpeechRequest() { Name = name, ResourceId=resourceId  }; break;
 					case "translator":
-						model = new RequestTranslatorModel() { Name = name, ResourceId = resourceId }; break;
+						model = new TranslatorRequest() { Name = name, ResourceId = resourceId }; break;
 					case "computer vision":
-						model = new RequestVisionModel() { Name = name, ResourceId = resourceId }; break;
+						model = new VisionRequest() { Name = name, ResourceId = resourceId }; break;
 					case "language":
-						model = new RequestLanguageModel() { Name = name, ResourceId = resourceId }; break;
+						model = new LanguageRequest() { Name = name, ResourceId = resourceId }; break;
 				}
 			}
 			return model;
@@ -167,7 +167,7 @@ namespace AI.Notebook.Web.Pages.Requests
 			return urlPath;
 		}
 
-		private async Task<string> DetermineRedirectPath(RequestModel model)
+		private async Task<string> DetermineRedirectPath(RequestBase model)
 		{
 			string urlPath = string.Empty;
 			if (model != null)
