@@ -1,8 +1,8 @@
 ﻿CREATE PROCEDURE [dbo].[spRequestsTranslator_Get]
-	@RequestId int
+	@Id int
 AS
 BEGIN
 	select req.*
 	from dbo.RequestsTranslator as req
-	where req.RequestId=@RequestId;
+	where req.Id=@Id;
 END

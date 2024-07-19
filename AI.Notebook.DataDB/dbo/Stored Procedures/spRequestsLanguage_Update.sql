@@ -1,6 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[spRequestsLanguage_Update]
-	@Name nvarchar(50),
-	@RequestId int,
+	@Id int,
+	@Name nvarchar(50),	
 	@SourceLangCode VARCHAR(10),
 	@TargetLangCode VARCHAR(10),
 	@Input NVARCHAR(max),
@@ -16,17 +16,11 @@
 AS
 BEGIN
 	SET NOCOUNT OFF;
-	BEGIN TRANSACTION [Tran1]
 	BEGIN TRY
-		
-		UPDATE dbo.Requests
-		SET
-		[Name] = @Name,
-		[UpdatedDt] = GETDATE()
-		WHERE [Id] = @RequestId;
 
 		UPDATE dbo.RequestsLanguage
 		SET 
+		[Name] = @Name,
 		[SourceLangCode] = @SourceLangCode,
 		[TargetLangCode] = @TargetLangCode,
 		[Input] = @Input,
@@ -40,16 +34,12 @@ BEGIN
 		[Summary] = @Summary,
 		[AbstractiveSummary] = @AbstractiveSummary,
 		[UpdatedDt] = GETDATE()
-		WHERE [RequestId] = @RequestId;
+		WHERE [Id] = @Id;
 
-		COMMIT TRANSACTION [Tran1]
-		
 		return 1;
 	END TRY
 	BEGIN CATCH
-		
-		ROLLBACK TRANSACTION [Tran1]
-		
+				
 		return 0;
 	END CATCH
 END

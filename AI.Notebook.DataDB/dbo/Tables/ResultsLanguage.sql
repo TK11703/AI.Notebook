@@ -1,7 +1,8 @@
 ﻿CREATE TABLE [dbo].[ResultsLanguage]
 (
 	[Id] INT NOT NULL PRIMARY KEY Identity,
-	[ResultId] INT NOT NULL,
+	[RequestId] INT NOT NULL,
+	[ResultTypeId] INT NULL,
 	[SourceLangCode] VARCHAR(10) NULL,
 	[TargetLangCode] VARCHAR(10) NULL,
 	[Input] NVARCHAR(max) NULL,
@@ -14,7 +15,10 @@
 	[NamedEntityRecognition] BIT NOT NULL Default 0,
 	[Summary] BIT NOT NULL Default 0,
 	[AbstractiveSummary] BIT NOT NULL Default 0,
+	[ResultText] NVARCHAR(MAX) NULL,
 	[CreatedDt] DATETIME NOT NULL, 
 	[UpdatedDt] DATETIME NOT NULL, 
-    CONSTRAINT [FK_ResultsLanguage_Results] FOREIGN KEY ([ResultId]) REFERENCES [Results]([Id])
+	[CompletedDt] DATETIME NOT NULL,
+    CONSTRAINT [FK_ResultsLanguage_RequestsLanguage] FOREIGN KEY ([RequestId]) REFERENCES [RequestsLanguage]([Id]),
+	CONSTRAINT [FK_ResultsLanguage_ResultTypes] FOREIGN KEY ([ResultTypeId]) REFERENCES [ResultTypes]([Id])
 )

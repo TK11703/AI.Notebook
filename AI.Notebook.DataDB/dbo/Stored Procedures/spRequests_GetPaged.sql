@@ -9,11 +9,42 @@
 	@Total int output
 AS
 BEGIN
-	SELECT @Total = Count(req.Id) 
-		FROM dbo.Requests AS req;
+	--Drop table is hanging around
+	DROP TABLE IF EXISTS #TempResults;
+	--Create table with expected results
+	Create Table #TempResults 
+	(
+		Id int, 
+		[Name] varchar(50),
+		ResourceId int,
+		DateCreated datetime, 
+		DateUpdated datetime
+	)
+	--Populate table with content
+	INSERT INTO #TempResults ( Id, [Name], ResourceId, DateCreated, DateUpdated	)
+	Select req.Id, req.[Name] as 'Name', resc.Id as 'ResourceId', req.CreatedDt, req.UpdatedDt 
+	From RequestsVision as req
+		inner join AIResources as resc on req.ResourceId = resc.Id
+
+	INSERT INTO #TempResults ( Id, [Name], ResourceId, DateCreated, DateUpdated	)
+	Select req.Id, req.[Name] as 'Name', resc.Id as 'ResourceId', req.CreatedDt, req.UpdatedDt 
+	From RequestsLanguage as req
+		inner join AIResources as resc on req.ResourceId = resc.Id
+
+	INSERT INTO #TempResults ( Id, [Name], ResourceId, DateCreated, DateUpdated	)
+	Select req.Id, req.[Name] as 'Name', resc.Id as 'ResourceId', req.CreatedDt, req.UpdatedDt 
+	From RequestsSpeech as req
+		inner join AIResources as resc on req.ResourceId = resc.Id
+
+	INSERT INTO #TempResults ( Id, [Name], ResourceId, DateCreated, DateUpdated	)
+	Select req.Id, req.[Name] as 'Name', resc.Id as 'ResourceId', req.CreatedDt, req.UpdatedDt  
+	From RequestsTranslator as req
+		inner join AIResources as resc on req.ResourceId = resc.Id
+
+	SELECT @Total = Count(Id) FROM #TempResults;
 
 	SELECT req.*
-		FROM dbo.Requests AS req
+		FROM #TempResults AS req
 		INNER JOIN dbo.AIResources as res on req.ResourceId = res.Id
 		WHERE 
 		(@Search IS NULL or (req.[Name] LIKE '%' + @Search +'%' OR req.[Name] LIKE '%' + @Search +'%'))

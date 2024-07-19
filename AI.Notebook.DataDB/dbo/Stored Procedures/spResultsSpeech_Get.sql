@@ -1,8 +1,8 @@
 ﻿CREATE PROCEDURE [dbo].[spResultsSpeech_Get]
-	@ResultId int
+	@Id int
 AS
 BEGIN
 	select res.*
 	from dbo.ResultsSpeech as res
-	where res.ResultId=@ResultId;
+	where res.Id=@Id;
 END

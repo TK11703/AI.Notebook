@@ -1,7 +1,8 @@
 ﻿CREATE TABLE [dbo].[RequestsLanguage]
 (
 	[Id] INT NOT NULL PRIMARY KEY Identity,
-	[RequestId] INT NOT NULL,
+	[Name] NVARCHAR(50) NOT NULL,
+	[ResourceId] INT NOT NULL, 
 	[SourceLangCode] VARCHAR(10) NULL,
 	[TargetLangCode] VARCHAR(10) NULL,
 	[Input] NVARCHAR(max) NULL,
@@ -16,5 +17,5 @@
 	[AbstractiveSummary] BIT NOT NULL Default 0,
 	[CreatedDt] DATETIME NOT NULL, 
 	[UpdatedDt] DATETIME NOT NULL, 
-    CONSTRAINT [FK_RequestsLanguage_Requests] FOREIGN KEY ([RequestId]) REFERENCES [Requests]([Id])
+    CONSTRAINT [FK_RequestsLanguage_AIResources] FOREIGN KEY ([ResourceId]) REFERENCES [AIResources]([Id])
 )

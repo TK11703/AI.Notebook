@@ -9,11 +9,46 @@
 	@Total int output
 AS
 BEGIN
-	SELECT @Total = Count(res.Id) 
-		FROM dbo.Results AS res;
+	--Drop table is hanging around
+	DROP TABLE IF EXISTS #TempResults;
+	--Create table with expected results
+	Create Table #TempResults 
+	(
+		Id int, 
+		ResourceId int,
+		ResultTypeId int, 
+		DateCreated datetime, 
+		DateUpdated datetime
+	)
+	--Populate table with content
+	INSERT INTO #TempResults ( Id, ResourceId, ResultTypeId, DateCreated, DateUpdated	)
+	Select res.Id, resc.Id as 'ResourceId', res.ResultTypeId, res.CreatedDt, res.UpdatedDt 
+	From ResultsVision as res
+		Inner Join RequestsVision as req on res.RequestId = req.Id
+		inner join AIResources as resc on req.ResourceId = resc.Id
+
+	INSERT INTO #TempResults ( Id, ResourceId, ResultTypeId, DateCreated, DateUpdated	)
+	Select res.Id, resc.Id as 'ResourceId', res.ResultTypeId, res.CreatedDt, res.UpdatedDt 
+	From ResultsLanguage as res
+		Inner Join RequestsLanguage as req on res.RequestId = req.Id
+		inner join AIResources as resc on req.ResourceId = resc.Id
+
+	INSERT INTO #TempResults ( Id, ResourceId, ResultTypeId, DateCreated, DateUpdated	)
+	Select res.Id, resc.Id as 'ResourceId', res.ResultTypeId, res.CreatedDt, res.UpdatedDt 
+	From ResultsSpeech as res
+		Inner Join RequestsSpeech as req on res.RequestId = req.Id
+		inner join AIResources as resc on req.ResourceId = resc.Id
+
+	INSERT INTO #TempResults ( Id, ResourceId, ResultTypeId, DateCreated, DateUpdated	)
+	Select res.Id, resc.Id as 'ResourceId', res.ResultTypeId, res.CreatedDt, res.UpdatedDt 
+	From ResultsTranslator as res
+		Inner Join RequestsTranslator as req on res.RequestId = req.Id
+		inner join AIResources as resc on req.ResourceId = resc.Id
+
+	SELECT @Total = Count(Id) FROM #TempResults;
 
 	SELECT res.*
-		FROM dbo.Results AS res
+		FROM #TempResults AS res
 		INNER JOIN dbo.AIResources as resc on res.ResourceId = resc.Id
 		WHERE 
 		--(@Search IS NULL or (resc.[Name] LIKE '%' + @Search +'%' OR resc.[Name] LIKE '%' + @Search +'%'))

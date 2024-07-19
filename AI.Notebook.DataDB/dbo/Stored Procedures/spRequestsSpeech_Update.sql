@@ -1,6 +1,6 @@
 ﻿CREATE PROCEDURE [dbo].[spRequestsSpeech_Update]
-	@Name nvarchar(50),
-	@RequestId int,
+	@Id int,
+	@Name nvarchar(50),	
 	@SourceLangCode VARCHAR(10),
 	@TargetLangCode VARCHAR(10),
 	@AudioUrl NVARCHAR(max),
@@ -14,17 +14,11 @@
 AS
 BEGIN
 	SET NOCOUNT OFF;
-	BEGIN TRANSACTION [Tran1]
 	BEGIN TRY
-
-		UPDATE dbo.Requests
-		SET
-		[Name] = @Name,
-		[UpdatedDt] = GETDATE()
-		WHERE [Id] = @RequestId;
 
 		UPDATE dbo.RequestsSpeech
 		SET 
+		[Name] = @Name,
 		[SourceLangCode] = @SourceLangCode,
 		[TargetLangCode] = @TargetLangCode,
 		[AudioUrl] = @AudioUrl,
@@ -32,19 +26,13 @@ BEGIN
 		[Translate] = @Translate,
 		[Transcribe] = @Transcribe,
 		[OutputAsAudio] = @OutputAsAudio,
-		[Ssml] = @Ssml,
-		[SsmlUrl] = @SsmlUrl,
 		[VoiceName] = @VoiceName,
 		[UpdatedDt] = GETDATE()
-		WHERE [RequestId] = @RequestId;
-
-		COMMIT TRANSACTION [Tran1]
-		
+		WHERE [Id] = @Id;
+	
 		return 1;
 	END TRY
 	BEGIN CATCH
-		
-		ROLLBACK TRANSACTION [Tran1]
 		
 		return 0;
 	END CATCH

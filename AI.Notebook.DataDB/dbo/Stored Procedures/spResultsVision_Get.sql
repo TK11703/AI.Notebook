@@ -1,8 +1,8 @@
 ﻿CREATE PROCEDURE [dbo].[spResultsVision_Get]
-	@ResultId int
+	@Id int
 AS
 BEGIN
 	select res.*
 	from dbo.ResultsVision as res
-	where res.ResultId=@ResultId;
+	where res.Id=@Id;
 END

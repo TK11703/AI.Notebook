@@ -1,7 +1,7 @@
 ﻿CREATE PROCEDURE [dbo].[spResultsVision_Insert]
-	@ResultId int,
+	@RequestId int,
 	@ImageUrl NVARCHAR(max),
-	@ImageData NVARCHAR(max),
+	@ImageData varbinary(max),
 	@GenderNeutralCaption BIT,
 	@Caption BIT,
 	@DenseCaptions BIT,
@@ -14,9 +14,9 @@
 AS
 BEGIN
 	INSERT INTO dbo.ResultsVision
-	([ResultId], [ImageUrl], [ImageData], [GenderNeutralCaption], [Caption], [DenseCaptions], [Tags], [ObjectDetection], [SmartCrop], [People], [Ocr], [CreatedDt], [UpdatedDt])
+		([RequestId], [ImageUrl], [ImageData], [GenderNeutralCaption], [Caption], [DenseCaptions], [Tags], [ObjectDetection], [SmartCrop], [People], [Ocr], [CreatedDt], [UpdatedDt])
 	Values
-	(@ResultId, @ImageUrl, @ImageData, @GenderNeutralCaption, @Caption, @DenseCaptions, @Tags, @ObjectDetection, @SmartCrop, @People, @Ocr, GETDATE(), GETDATE());
+		(@RequestId, @ImageUrl, @ImageData, @GenderNeutralCaption, @Caption, @DenseCaptions, @Tags, @ObjectDetection, @SmartCrop, @People, @Ocr, GETDATE(), GETDATE());
 
 	SET @Id = SCOPE_IDENTITY();
 

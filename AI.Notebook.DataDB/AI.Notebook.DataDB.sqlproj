@@ -61,8 +61,6 @@
     <Folder Include="dbo\Stored Procedures" />
   </ItemGroup>
   <ItemGroup>
-    <Build Include="dbo\Tables\Requests.sql" />
-    <Build Include="dbo\Tables\Results.sql" />
     <Build Include="dbo\Tables\AIResources.sql" />
     <Build Include="dbo\Tables\ResultTypes.sql" />
     <Build Include="dbo\Tables\RequestsTranslator.sql" />
@@ -74,12 +72,8 @@
     <Build Include="dbo\Stored Procedures\spAIResources_GetAll.sql" />
     <Build Include="dbo\Stored Procedures\spAIResources_Insert.sql" />
     <Build Include="dbo\Stored Procedures\spAIResources_Update.sql" />
-    <Build Include="dbo\Stored Procedures\spRequests_Delete.sql" />
-    <Build Include="dbo\Stored Procedures\spRequests_Get.sql" />
-    <Build Include="dbo\Stored Procedures\spRequests_GetAll.sql" />
+    <Build Include="dbo\Stored Procedures\spRequestsLanguage_Delete.sql" />
     <Build Include="dbo\Stored Procedures\spRequests_GetPaged.sql" />
-    <Build Include="dbo\Stored Procedures\spRequests_Insert.sql" />
-    <Build Include="dbo\Stored Procedures\spRequests_Update.sql" />
     <Build Include="dbo\Stored Procedures\spRequestsLanguage_Get.sql" />
     <Build Include="dbo\Stored Procedures\spRequestsLanguage_Insert.sql" />
     <Build Include="dbo\Stored Procedures\spRequestsLanguage_Update.sql" />
@@ -92,12 +86,6 @@
     <Build Include="dbo\Stored Procedures\spRequestsVision_Get.sql" />
     <Build Include="dbo\Stored Procedures\spRequestsVision_Insert.sql" />
     <Build Include="dbo\Stored Procedures\spRequestsVision_Update.sql" />
-    <Build Include="dbo\Stored Procedures\spResults_Delete.sql" />
-    <Build Include="dbo\Stored Procedures\spResults_Get.sql" />
-    <Build Include="dbo\Stored Procedures\spResults_GetByRequest.sql" />
-    <Build Include="dbo\Stored Procedures\spResults_GetByResource.sql" />
-    <Build Include="dbo\Stored Procedures\spResults_Insert.sql" />
-    <Build Include="dbo\Stored Procedures\spResults_Update.sql" />
     <Build Include="dbo\Stored Procedures\spResultTypes_Delete.sql" />
     <Build Include="dbo\Stored Procedures\spResultTypes_Get.sql" />
     <Build Include="dbo\Stored Procedures\spResultTypes_GetAll.sql" />
@@ -121,6 +109,13 @@
     <Build Include="dbo\Stored Procedures\spResultsSpeech_Delete.sql" />
     <Build Include="dbo\Stored Procedures\spResultsVision_Delete.sql" />
     <Build Include="dbo\Stored Procedures\spResultsLanguage_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\spRequestsSpeech_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\spRequestsTranslator_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\spRequestsVision_Delete.sql" />
+    <Build Include="dbo\Stored Procedures\spResultsVision_Update.sql" />
+    <Build Include="dbo\Stored Procedures\spResultsTranslator_Update.sql" />
+    <Build Include="dbo\Stored Procedures\spResultsSpeech_Update.sql" />
+    <Build Include="dbo\Stored Procedures\spResultsLanguage_Update.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />

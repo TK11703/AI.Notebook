@@ -1,5 +1,5 @@
 ﻿CREATE PROCEDURE [dbo].[spResultsLanguage_Insert]
-	@ResultId int,
+	@RequestId int,
 	@SourceLangCode VARCHAR(10),
 	@TargetLangCode VARCHAR(10),
 	@Input NVARCHAR(max),
@@ -16,11 +16,11 @@
 AS
 BEGIN
 	INSERT INTO dbo.ResultsLanguage
-	([ResultId], [SourceLangCode],	[TargetLangCode], [Input], [Language], [Sentiment], [KeyPhrases], [Entities], [PiiEntities], [LinkedEntities], 
-		[NamedEntityRecognition], [Summary], [AbstractiveSummary], [CreatedDt], [UpdatedDt])
+		([RequestId], [SourceLangCode],	[TargetLangCode], [Input], [Language], [Sentiment], [KeyPhrases], [Entities], [PiiEntities], [LinkedEntities], 
+			[NamedEntityRecognition], [Summary], [AbstractiveSummary], [CreatedDt], [UpdatedDt])
 	Values
-	(@ResultId, @SourceLangCode, @TargetLangCode, @Input, @Language, @Sentiment, @KeyPhrases, @Entities, @PiiEntities, @LinkedEntities, 
-		@NamedEntityRecognition, @Summary, @AbstractiveSummary, GETDATE(), GETDATE());
+		(@RequestId, @SourceLangCode, @TargetLangCode, @Input, @Language, @Sentiment, @KeyPhrases, @Entities, @PiiEntities, @LinkedEntities, 
+			@NamedEntityRecognition, @Summary, @AbstractiveSummary, GETDATE(), GETDATE());
 
 	SET @Id = SCOPE_IDENTITY();
 

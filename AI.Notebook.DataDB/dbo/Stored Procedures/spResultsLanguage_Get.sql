@@ -1,8 +1,8 @@
 ﻿CREATE PROCEDURE [dbo].[spResultsLanguage_Get]
-	@ResultId int
+	@Id int
 AS
 BEGIN
 	select res.*
 	from dbo.ResultsLanguage as res
-	where res.ResultId=@ResultId;
+	where res.Id=@Id;
 END

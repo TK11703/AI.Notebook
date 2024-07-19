@@ -1,8 +1,8 @@
 ﻿CREATE PROCEDURE [dbo].[spRequestsLanguage_Get]
-	@RequestId int
+	@Id int
 AS
 BEGIN
 	select req.*
 	from dbo.RequestsLanguage as req
-	where req.RequestId=@RequestId;
+	where req.Id=@Id;
 END
