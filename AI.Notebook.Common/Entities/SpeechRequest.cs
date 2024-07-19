@@ -1,11 +1,8 @@
 ﻿namespace AI.Notebook.Common.Entities;
 public class SpeechRequest : RequestBase
 {
-	public int RequestId { get; set; }
 	public string? AudioUrl { get; set; }
 	public byte[]? AudioData { get; set; }
-	public string? Ssml { get; set; }
-	public string? SsmlUrl { get; set; }
 	public string? VoiceName { get; set; }
 	public string? SourceLangCode { get; set; }
 	public string TargetLangCode { get; set; } = string.Empty;

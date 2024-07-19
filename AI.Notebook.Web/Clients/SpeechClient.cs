@@ -54,4 +54,39 @@ public sealed class SpeechClient
 		_logger.LogError($"Http Status: {response.StatusCode}{Environment.NewLine}Http Message: {await response.Content.ReadAsStringAsync()}");
 		return null;
 	}
+
+	public async Task<IEnumerable<ResultBase>?> GetSpeechResultsByRequest(int requestId)
+	{
+		using HttpResponseMessage response = await _httpClient.GetAsync($"Results/Request/{requestId}");
+		if (response.IsSuccessStatusCode)
+		{
+			return await response.Content.ReadFromJsonAsync<IEnumerable<ResultBase>>();
+		}
+		_logger.LogError($"Http Status: {response.StatusCode}{Environment.NewLine}Http Message: {await response.Content.ReadAsStringAsync()}");
+		return Enumerable.Empty<ResultBase>();
+	}
+
+	public async Task<bool> DeleteRequest(int id)
+	{
+		using HttpResponseMessage response = await _httpClient.DeleteAsync($"Request/{id}");
+		if (response.IsSuccessStatusCode)
+		{
+			return await response.Content.ReadFromJsonAsync<bool>();
+		}
+		_logger.LogError($"Http Status: {response.StatusCode}{Environment.NewLine}Http Message: {await response.Content.ReadAsStringAsync()}");
+
+		return false;
+	}
+
+	public async Task<bool> DeleteResult(int id)
+	{
+		using HttpResponseMessage response = await _httpClient.DeleteAsync($"Result/{id}");
+		if (response.IsSuccessStatusCode)
+		{
+			return await response.Content.ReadFromJsonAsync<bool>();
+		}
+		_logger.LogError($"Http Status: {response.StatusCode}{Environment.NewLine}Http Message: {await response.Content.ReadAsStringAsync()}");
+
+		return false;
+	}
 }

@@ -12,15 +12,18 @@
 	@NamedEntityRecognition BIT,
 	@Summary BIT,
 	@AbstractiveSummary BIT,
+	@ResultTypeId int = null,
+	@ResultText nvarchar(max) = null,
+	@CompletedDt datetime = null,
 	@Id int output
 AS
 BEGIN
 	INSERT INTO dbo.ResultsLanguage
 		([RequestId], [SourceLangCode],	[TargetLangCode], [Input], [Language], [Sentiment], [KeyPhrases], [Entities], [PiiEntities], [LinkedEntities], 
-			[NamedEntityRecognition], [Summary], [AbstractiveSummary], [CreatedDt], [UpdatedDt])
+			[NamedEntityRecognition], [Summary], [AbstractiveSummary], [CreatedDt], [UpdatedDt], [ResultTypeId], [ResultText], [CompletedDt])
 	Values
 		(@RequestId, @SourceLangCode, @TargetLangCode, @Input, @Language, @Sentiment, @KeyPhrases, @Entities, @PiiEntities, @LinkedEntities, 
-			@NamedEntityRecognition, @Summary, @AbstractiveSummary, GETDATE(), GETDATE());
+			@NamedEntityRecognition, @Summary, @AbstractiveSummary, GETDATE(), GETDATE(), @ResultTypeId, @ResultText, @CompletedDt);
 
 	SET @Id = SCOPE_IDENTITY();
 

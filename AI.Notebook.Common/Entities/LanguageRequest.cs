@@ -1,7 +1,6 @@
 ﻿namespace AI.Notebook.Common.Entities;
 public class LanguageRequest : RequestBase
 {
-	public int RequestId { get; set; }
 	public string Input { get; set; } = string.Empty;
 	public string? SourceLangCode { get; set; }
 	public string TargetLangCode { get; set; } = string.Empty;

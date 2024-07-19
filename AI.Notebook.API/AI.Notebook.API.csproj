@@ -8,6 +8,49 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Endpoints\AIRequests\Delete\**" />
+    <Compile Remove="Endpoints\AIRequests\GetAll\**" />
+    <Compile Remove="Endpoints\AIRequests\GetById\**" />
+    <Compile Remove="Endpoints\AIRequests\Update\**" />
+    <Compile Remove="Endpoints\AIResults\Delete\**" />
+    <Compile Remove="Endpoints\AIResults\GetByAIResource\**" />
+    <Compile Remove="Endpoints\AIResults\GetById\**" />
+    <Compile Remove="Endpoints\AIResults\GetByRequest\**" />
+    <Compile Remove="Endpoints\AIResults\Insert\**" />
+    <Compile Remove="Endpoints\AIResults\Update\**" />
+    <Content Remove="Endpoints\AIRequests\Delete\**" />
+    <Content Remove="Endpoints\AIRequests\GetAll\**" />
+    <Content Remove="Endpoints\AIRequests\GetById\**" />
+    <Content Remove="Endpoints\AIRequests\Update\**" />
+    <Content Remove="Endpoints\AIResults\Delete\**" />
+    <Content Remove="Endpoints\AIResults\GetByAIResource\**" />
+    <Content Remove="Endpoints\AIResults\GetById\**" />
+    <Content Remove="Endpoints\AIResults\GetByRequest\**" />
+    <Content Remove="Endpoints\AIResults\Insert\**" />
+    <Content Remove="Endpoints\AIResults\Update\**" />
+    <EmbeddedResource Remove="Endpoints\AIRequests\Delete\**" />
+    <EmbeddedResource Remove="Endpoints\AIRequests\GetAll\**" />
+    <EmbeddedResource Remove="Endpoints\AIRequests\GetById\**" />
+    <EmbeddedResource Remove="Endpoints\AIRequests\Update\**" />
+    <EmbeddedResource Remove="Endpoints\AIResults\Delete\**" />
+    <EmbeddedResource Remove="Endpoints\AIResults\GetByAIResource\**" />
+    <EmbeddedResource Remove="Endpoints\AIResults\GetById\**" />
+    <EmbeddedResource Remove="Endpoints\AIResults\GetByRequest\**" />
+    <EmbeddedResource Remove="Endpoints\AIResults\Insert\**" />
+    <EmbeddedResource Remove="Endpoints\AIResults\Update\**" />
+    <None Remove="Endpoints\AIRequests\Delete\**" />
+    <None Remove="Endpoints\AIRequests\GetAll\**" />
+    <None Remove="Endpoints\AIRequests\GetById\**" />
+    <None Remove="Endpoints\AIRequests\Update\**" />
+    <None Remove="Endpoints\AIResults\Delete\**" />
+    <None Remove="Endpoints\AIResults\GetByAIResource\**" />
+    <None Remove="Endpoints\AIResults\GetById\**" />
+    <None Remove="Endpoints\AIResults\GetByRequest\**" />
+    <None Remove="Endpoints\AIResults\Insert\**" />
+    <None Remove="Endpoints\AIResults\Update\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Api.cs" />
   </ItemGroup>
 

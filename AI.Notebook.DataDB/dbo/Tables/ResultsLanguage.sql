@@ -18,7 +18,7 @@
 	[ResultText] NVARCHAR(MAX) NULL,
 	[CreatedDt] DATETIME NOT NULL, 
 	[UpdatedDt] DATETIME NOT NULL, 
-	[CompletedDt] DATETIME NOT NULL,
+	[CompletedDt] DATETIME NULL,
     CONSTRAINT [FK_ResultsLanguage_RequestsLanguage] FOREIGN KEY ([RequestId]) REFERENCES [RequestsLanguage]([Id]),
 	CONSTRAINT [FK_ResultsLanguage_ResultTypes] FOREIGN KEY ([ResultTypeId]) REFERENCES [ResultTypes]([Id])
 )

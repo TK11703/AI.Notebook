@@ -1,7 +1,6 @@
 ﻿namespace AI.Notebook.Common.Entities;
 public class VisionRequest : RequestBase
 {
-	public int RequestId { get; set; }
 	public string? ImageUrl { get; set; }
 	public byte[]? ImageData { get; set; }
 	public bool GenderNeutralCaption { get; set; } = false;

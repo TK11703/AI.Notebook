@@ -6,7 +6,7 @@
 	[SourceLangCode] VARCHAR(10) NULL,
 	[TargetLangCode] VARCHAR(10) NULL,
 	[AudioUrl] NVARCHAR(max) NULL,
-	[AudioData] NVARCHAR(max) NULL,
+	[AudioData] VARBINARY(max) NULL,
 	[Translate] BIT NOT NULL Default 0,
 	[Transcribe] BIT NOT NULL Default 0,
 	[OutputAsAudio] BIT NOT NULL Default 0,

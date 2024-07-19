@@ -7,13 +7,17 @@
 	@Transliterate BIT,
 	@OutputAsAudio BIT,
 	@VoiceName VARCHAR(100),
+	@ResultTypeId int = null,
+	@ResultText nvarchar(max) = null,	
+	@ResultAudio varbinary(max),
+	@CompletedDt datetime = null,
 	@Id int output
 AS
 BEGIN
 	INSERT INTO dbo.ResultsTranslator
-		([RequestId], [SourceLangCode], [TargetLangCode], [Input], [Translate], [Transliterate], [OutputAsAudio], [VoiceName], [CreatedDt], [UpdatedDt])
+		([RequestId], [SourceLangCode], [TargetLangCode], [Input], [Translate], [Transliterate], [OutputAsAudio], [VoiceName], [CreatedDt], [UpdatedDt], [ResultTypeId], [ResultText], [ResultAudio], [CompletedDt])
 	Values
-		(@RequestId, @SourceLangCode, @TargetLangCode, @Input, @Translate, @Transliterate, @OutputAsAudio, @VoiceName, GETDATE(), GETDATE());
+		(@RequestId, @SourceLangCode, @TargetLangCode, @Input, @Translate, @Transliterate, @OutputAsAudio, @VoiceName, GETDATE(), GETDATE(), @ResultTypeId, @ResultText, @ResultAudio, @CompletedDt);
 
 	SET @Id = SCOPE_IDENTITY();
 

@@ -16,12 +16,7 @@ public class InsertSpeechRequest : IEndpoint
 	{
 		try
 		{
-			int newId = await requestData.InsertAsync(aRequestModel);
-			if (newId > 0)
-			{
-				aRequestModel.RequestId = newId;
-				await requestData.InsertSpeechAsync(aRequestModel);
-			}
+			int newId = await requestData.InsertSpeechAsync(aRequestModel);
 			return TypedResults.Ok(newId);
 		}
 		catch (Exception ex)

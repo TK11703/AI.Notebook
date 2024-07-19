@@ -15,7 +15,7 @@
 	[ResultAudio] VARBINARY(MAX) NULL,
 	[CreatedDt] DATETIME NOT NULL, 
 	[UpdatedDt] DATETIME NOT NULL, 
-	[CompletedDt] DATETIME NOT NULL,
+	[CompletedDt] DATETIME NULL,
     CONSTRAINT [FK_ResultsSpeech_RequestsSpeech] FOREIGN KEY ([RequestId]) REFERENCES [RequestsSpeech]([Id]),
 	CONSTRAINT [FK_ResultsSpeech_ResultTypes] FOREIGN KEY ([ResultTypeId]) REFERENCES [ResultTypes]([Id])
 )

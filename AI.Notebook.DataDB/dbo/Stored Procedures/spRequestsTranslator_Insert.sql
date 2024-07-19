@@ -1,4 +1,5 @@
 ﻿CREATE PROCEDURE [dbo].[spRequestsTranslator_Insert]
+	@ResourceId int,
 	@Name nvarchar(50),
 	@SourceLangCode VARCHAR(10),
 	@TargetLangCode VARCHAR(10),
@@ -11,9 +12,9 @@
 AS
 BEGIN
 	INSERT INTO dbo.RequestsTranslator
-		([Name], [SourceLangCode], [TargetLangCode], [Input], [Translate], [Transliterate], [OutputAsAudio], [VoiceName], [CreatedDt], [UpdatedDt])
+		([ResourceId], [Name], [SourceLangCode], [TargetLangCode], [Input], [Translate], [Transliterate], [OutputAsAudio], [VoiceName], [CreatedDt], [UpdatedDt])
 	Values
-		(@Name, @SourceLangCode, @TargetLangCode, @Input, @Translate, @Transliterate, @OutputAsAudio, @VoiceName, GETDATE(), GETDATE());
+		(@ResourceId, @Name, @SourceLangCode, @TargetLangCode, @Input, @Translate, @Transliterate, @OutputAsAudio, @VoiceName, GETDATE(), GETDATE());
 
 	SET @Id = SCOPE_IDENTITY();
 

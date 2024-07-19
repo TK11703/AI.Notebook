@@ -16,7 +16,7 @@
 	[ResultText] NVARCHAR(MAX) NULL,
 	[CreatedDt] DATETIME NOT NULL, 
 	[UpdatedDt] DATETIME NOT NULL, 
-	[CompletedDt] DATETIME NOT NULL,
+	[CompletedDt] DATETIME NULL,
     CONSTRAINT [FK_ResultsVision_RequestsVision] FOREIGN KEY ([RequestId]) REFERENCES [RequestsVision]([Id]),
 	CONSTRAINT [FK_ResultsVision_ResultTypes] FOREIGN KEY ([ResultTypeId]) REFERENCES [ResultTypes]([Id])
 )

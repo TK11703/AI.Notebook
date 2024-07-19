@@ -12,4 +12,5 @@ public class VisionResult : ResultBase
 	public bool SmartCrop { get; set; } = false;
 	public bool People { get; set; } = false;
 	public bool Ocr { get; set; } = false;
+	public string? ResultText { get; set; }
 }

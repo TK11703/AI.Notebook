@@ -17,11 +17,10 @@ public class ResultModelBase
 
 	public ResultType? ResultType { get; set; }
 
-	[Display(Name = "Result")]
-	public byte[] ResultData { get; set; } = new byte[0];
+
 
 	[Display(Name = "Date Completed")]
-	public DateTime CompletedDt { get; set; }
+	public DateTime? CompletedDt { get; set; }
 
 	[Display(Name = "Date Created")]
 	public DateTime CreatedDt { get; set; }

@@ -16,12 +16,7 @@ public class InsertVisionRequest : IEndpoint
 	{
 		try
 		{
-			int newId = await requestData.InsertAsync(aRequestModel);
-			if (newId > 0)
-			{
-				aRequestModel.RequestId = newId;
-				await requestData.InsertVisionAsync(aRequestModel);
-			}
+			int newId = await requestData.InsertVisionAsync(aRequestModel);
 			return TypedResults.Ok(newId);
 		}
 		catch (Exception ex)

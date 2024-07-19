@@ -10,16 +10,25 @@ using System.Reflection;
 namespace AI.Notebook.Web.Pages.Requests
 {
 	public class IndexModel : PageModel
-    {
+	{
 		private readonly AIResourcesClient _resourceClient;
 		private readonly RequestsClient _requestClient;
+		private readonly TranslatorClient _translatorClient;
+		private readonly SpeechClient _speechClient;
+		private readonly VisionClient _visionClient;
+		private readonly LanguageClient _languageClient;
 		private readonly ILogger<IndexModel> _logger;
 
-		public IndexModel(ILogger<IndexModel> logger, RequestsClient requestClient, AIResourcesClient resourceClient)
+		public IndexModel(ILogger<IndexModel> logger, RequestsClient requestClient, AIResourcesClient resourceClient, TranslatorClient translatorClient, SpeechClient speechClient,
+			VisionClient visionClient, LanguageClient languageClient)
 		{
 			_logger = logger;
 			_requestClient = requestClient;
 			_resourceClient = resourceClient;
+			_translatorClient = translatorClient;
+			_speechClient = speechClient;
+			_languageClient = languageClient;
+			_visionClient = visionClient;
 			PageResult = new PageResult<RequestBase>(CurrentPage, 0);
 			PageSubmission = new PageRequest();
 			RequestFormModel = new RequestNewModel();
@@ -42,7 +51,7 @@ namespace AI.Notebook.Web.Pages.Requests
 		public RequestNewModel RequestFormModel { get; set; }
 
 		public async Task OnGetAsync()
-        {
+		{
 			AIResources = await _resourceClient.GetAll();
 			if (AIResources != null)
 			{
@@ -55,7 +64,7 @@ namespace AI.Notebook.Web.Pages.Requests
 				PageResult = await _requestClient.GetAll(PageSubmission);
 				foreach (RequestBase model in PageResult.Collection)
 				{
-					model.ItemUrlPath = $"{await DetermineRedirectPath(model)}/{model.Id}";
+					model.ItemUrlPath = $"{GetRedirectPath(model.AIResource.Name)}/{model.Id}";
 				}
 			}
 			catch (Exception ex)
@@ -80,9 +89,9 @@ namespace AI.Notebook.Web.Pages.Requests
 			try
 			{
 				PageResult = await _requestClient.GetAll(PageSubmission);
-				foreach(RequestBase model in PageResult.Collection)
+				foreach (RequestBase model in PageResult.Collection)
 				{
-					model.ItemUrlPath = $"{await DetermineRedirectPath(model)}/{model.Id}";
+					model.ItemUrlPath = $"{GetRedirectPath(model.AIResource.Name)}/{model.Id}";
 				}
 			}
 			catch (Exception ex)
@@ -103,27 +112,38 @@ namespace AI.Notebook.Web.Pages.Requests
 			//ModelState.ClearValidationState(nameof(RequestFormModel));
 			if (RequestFormModel != null && TryValidateModel(RequestFormModel))
 			{
-				dynamic? requestModel = await GetRequestModel(RequestFormModel.ResourceId, RequestFormModel.Name);
-				if (requestModel != null)
+				var resourceModel = await _resourceClient.Get(RequestFormModel.ResourceId);
+				if (resourceModel == null)
 				{
-					try
+					HttpContext.Session.SetString("Error", $"The Request was not saved successfully, because the resource ID was not valid.");
+					return RedirectToPage();
+				}
+				try
+				{
+					int newItemId = 0;
+					switch (resourceModel.Name.ToLower())
 					{
-						int newItemId = await _requestClient.Create(requestModel);
-						HttpContext.Session.SetString("Notification", $"The Request was created successfully.");
-						string redirectUrl = await DetermineRedirectPath(RequestFormModel.ResourceId);
-						return RedirectToPage($"{redirectUrl}", new { id = newItemId });
+						case "speech service":
+							newItemId = await SaveNewSpeechRequest(RequestFormModel.Name, RequestFormModel.ResourceId); break;
+						case "translator":
+							newItemId = await SaveNewTranslatorRequest(RequestFormModel.Name, RequestFormModel.ResourceId); break;
+						case "computer vision":
+							newItemId = await SaveNewVisionRequest(RequestFormModel.Name, RequestFormModel.ResourceId); break;
+						case "language":
+							newItemId = await SaveNewLanguageRequest(RequestFormModel.Name, RequestFormModel.ResourceId); break;
 					}
-					catch (Exception ex)
+					if (newItemId == 0)
 					{
-						_logger.LogError(ex, "The Request was not saved successfully.");
 						HttpContext.Session.SetString("Error", $"The Request was not saved successfully.");
 						return RedirectToPage();
 					}
+					string redirectUrl = GetRedirectPath(resourceModel.Name);
+					return RedirectToPage($"{redirectUrl}", new { id = newItemId });
 				}
-				else
+				catch (Exception ex)
 				{
-					//log error and respond with a bad request
-					HttpContext.Session.SetString("Error", $"The Request was not saved successfully, because the resource ID was not valid.");
+					_logger.LogError(ex, "The Request was not saved successfully.");
+					HttpContext.Session.SetString("Error", $"The Request was not saved successfully.");
 					return RedirectToPage();
 				}
 			}
@@ -135,53 +155,28 @@ namespace AI.Notebook.Web.Pages.Requests
 			}
 		}
 
-		private async Task<dynamic?> GetRequestModel(int resourceId, string name)
+		private async Task<int> SaveNewTranslatorRequest(string name, int resourceId)
 		{
-			var aiResourceModel = await _resourceClient.Get(resourceId);
-			dynamic? model = null;
-			if (aiResourceModel != null)
-			{
-				switch (aiResourceModel.Name.ToLower())
-				{
-					case "speech service":
-						model = new SpeechRequest() { Name = name, ResourceId=resourceId  }; break;
-					case "translator":
-						model = new TranslatorRequest() { Name = name, ResourceId = resourceId }; break;
-					case "computer vision":
-						model = new VisionRequest() { Name = name, ResourceId = resourceId }; break;
-					case "language":
-						model = new LanguageRequest() { Name = name, ResourceId = resourceId }; break;
-				}
-			}
-			return model;
+			var model = new TranslatorRequest() { Name = name, ResourceId = resourceId };
+			return await _translatorClient.Create(model);
 		}
 
-		private async Task<string> DetermineRedirectPath(int resourceId)
+		private async Task<int> SaveNewVisionRequest(string name, int resourceId)
 		{
-			var aiResourceModel = await _resourceClient.Get(resourceId);
-			string urlPath = string.Empty;
-			if (aiResourceModel != null)
-			{
-				urlPath = GetRedirectPath(aiResourceModel.Name);
-			}
-			return urlPath;
+			var model = new VisionRequest() { Name = name, ResourceId = resourceId };
+			return await _visionClient.Create(model);
 		}
 
-		private async Task<string> DetermineRedirectPath(RequestBase model)
+		private async Task<int> SaveNewLanguageRequest(string name, int resourceId)
 		{
-			string urlPath = string.Empty;
-			if (model != null)
-			{
-				if(model.AIResource != null && !string.IsNullOrEmpty(model.AIResource.Name))
-				{
-					urlPath = GetRedirectPath(model.AIResource.Name);
-				}
-				else
-				{
-					urlPath = await DetermineRedirectPath(model.ResourceId);
-				}
-			}
-			return urlPath;
+			var model = new LanguageRequest() { Name = name, ResourceId = resourceId };
+			return await _languageClient.Create(model);
+		}
+
+		private async Task<int> SaveNewSpeechRequest(string name, int resourceId)
+		{
+			var model = new SpeechRequest() { Name = name, ResourceId = resourceId };
+			return await _speechClient.Create(model);
 		}
 
 		private string GetRedirectPath(string serviceName)
@@ -190,13 +185,13 @@ namespace AI.Notebook.Web.Pages.Requests
 			switch (serviceName.ToLower())
 			{
 				case "speech service":
-					urlPath = "./Requests/Speech/Item"; break;
+					urlPath = "/Requests/Speech/Item"; break;
 				case "translator":
-					urlPath = "./Requests/Translator/Item"; break;
+					urlPath = "/Requests/Translator/Item"; break;
 				case "computer vision":
-					urlPath = "./Requests/Vision/Item"; break;
+					urlPath = "/Requests/Vision/Item"; break;
 				case "language":
-					urlPath = "./Requests/Language/Item"; break;
+					urlPath = "/Requests/Language/Item"; break;
 			}
 			return urlPath;
 		}

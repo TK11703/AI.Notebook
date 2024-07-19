@@ -12,15 +12,4 @@ public class RequestBase
 	public DateTime UpdatedDt { get; set; }
 	[NotMapped]
 	public string ItemUrlPath { get; set; } = string.Empty;
-
-	public void CopyBaseData(RequestBase? baseObj)
-	{
-		if (baseObj != null)
-		{
-			Id = baseObj.Id;
-			ResourceId = baseObj.ResourceId;
-			Name = baseObj.Name;
-			AIResource = baseObj.AIResource;
-		}
-	}
 }

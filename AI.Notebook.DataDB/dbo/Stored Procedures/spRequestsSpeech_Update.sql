@@ -4,7 +4,7 @@
 	@SourceLangCode VARCHAR(10),
 	@TargetLangCode VARCHAR(10),
 	@AudioUrl NVARCHAR(max),
-	@AudioData NVARCHAR(max),
+	@AudioData VARBINARY(max),
 	@Translate BIT,
 	@Transcribe BIT,
 	@OutputAsAudio BIT,

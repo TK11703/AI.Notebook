@@ -1,4 +1,5 @@
 ﻿CREATE PROCEDURE [dbo].[spRequestsLanguage_Insert]
+	@ResourceId int,
 	@Name nvarchar(50),
 	@SourceLangCode VARCHAR(10),
 	@TargetLangCode VARCHAR(10),
@@ -16,10 +17,10 @@
 AS
 BEGIN
 	INSERT INTO dbo.RequestsLanguage
-		([Name], [Input], [SourceLangCode], [TargetLangCode], [Language], [Sentiment], [KeyPhrases],[Entities], [PiiEntities], [LinkedEntities], 
+		([ResourceId], [Name], [Input], [SourceLangCode], [TargetLangCode], [Language], [Sentiment], [KeyPhrases],[Entities], [PiiEntities], [LinkedEntities], 
 			[NamedEntityRecognition], [Summary], [AbstractiveSummary], [CreatedDt], [UpdatedDt])
 	Values	
-		(@Name, @Input, @SourceLangCode, @TargetLangCode, @Language, @Sentiment, @KeyPhrases, @Entities, @PiiEntities, @LinkedEntities, 
+		(@ResourceId, @Name, @Input, @SourceLangCode, @TargetLangCode, @Language, @Sentiment, @KeyPhrases, @Entities, @PiiEntities, @LinkedEntities, 
 			@NamedEntityRecognition, @Summary, @AbstractiveSummary, GETDATE(), GETDATE());
 
 	SET @Id = SCOPE_IDENTITY();

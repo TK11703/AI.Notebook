@@ -79,7 +79,7 @@ public class TextTranslationServices
 		Response<IReadOnlyList<TranslatedTextItem>> translationResponse = await _translationClient.TranslateAsync(targetLangCode, input);
 		IReadOnlyList<TranslatedTextItem> translations = translationResponse.Value;
 		TranslatedTextItem translation = translations[0];
-		byte[]? audioOutput = null;
+		byte[]? audioOutput = new byte[0];
 		if (outputAsAudio)
 		{
 			audioOutput = await GenerateAudio(translation?.Translations?[0]?.Text, voiceName);
@@ -100,7 +100,7 @@ public class TextTranslationServices
 		Response<IReadOnlyList<TranslatedTextItem>> translationResponse = await _translationClient.TranslateAsync(targetLanguage: targetLangCode, sourceLanguage: sourceLangCode, text: input);
 		IReadOnlyList<TranslatedTextItem> translations = translationResponse.Value;
 		TranslatedTextItem translation = translations[0];
-		byte[]? audioOutput = null;
+		byte[]? audioOutput = new byte[0];
 		if (outputAsAudio)
 		{
 			audioOutput = await GenerateAudio(translation?.Translations?[0]?.Text, voiceName);
@@ -151,7 +151,7 @@ public class TextTranslationServices
 		return null;
 	}
 
-	private async Task<byte[]?> GenerateAudio(string ssml)
+	public async Task<byte[]?> GenerateSsmlAudio(string ssml)
 	{
 		if (!string.IsNullOrEmpty(ssml))
 		{

@@ -1,29 +1,28 @@
-﻿using AI.Notebook.Common.AI.Text;
-using AI.Notebook.Common.Entities;
+﻿using AI.Notebook.Common.Entities;
 
 namespace AI.Notebook.DataAccess.Data;
 public interface IResultData
 {
-	Task<bool> DeleteAsync(int id);
-	Task<bool> DeleteTranslatorResultAsync(int id, int resultId);
-	Task<bool> DeleteSpeechResultAsync(int id, int resultId);
-	Task<bool> DeleteVisionResultAsync(int id, int resultId);
-	Task<bool> DeleteLanguageResultAsync(int id, int resultId);
-	
-	Task<IEnumerable<ResultBase>> GetByRequestAsync(int requestId);
-	Task<IEnumerable<ResultBase>> GetByResourceAsync(int resourceId);
-	Task<ResultBase?> GetAsync(int id);
-
+	Task<bool> DeleteLanguageResultAsync(int id);
+	Task<bool> DeleteSpeechResultAsync(int id);
+	Task<bool> DeleteTranslatorResultAsync(int id);
+	Task<bool> DeleteVisionResultAsync(int id);
+	Task<LanguageResult?> GetLanguageAsync(int id);
 	Task<PageResult<ResultBase>> GetPagedAsync(PageRequest pageRequest);
-	Task<TranslatorResult?> GetTranslatorAsync(int resultId);
-	Task<VisionResult?> GetVisionAsync(int resultId);
-	Task<SpeechResult?> GetSpeechAsync(int resultId);
-	Task<LanguageResult?> GetLanguageAsync(int resultId);
-	Task<int> InsertAsync(ResultBase item);
-	Task<int> InsertTranslatorAsync(TranslatorResult item);
-	Task<int> InsertSpeechAsync(SpeechResult item);
-	Task<int> InsertVisionAsync(VisionResult item);
+	Task<SpeechResult?> GetSpeechAsync(int id);
+	Task<TranslatorResult?> GetTranslatorAsync(int id);
+	Task<VisionResult?> GetVisionAsync(int id);
 	Task<int> InsertLanguageAsync(LanguageResult item);
+	Task<int> InsertSpeechAsync(SpeechResult item);
+	Task<int> InsertTranslatorAsync(TranslatorResult item);
+	Task<int> InsertVisionAsync(VisionResult item);
+	int UpdateLanguage(int id, int resultTypeId, string resultText, DateTime? completedDate);
+	int UpdateSpeech(int id, int resultTypeId, string resultText, byte[] resultAudio, DateTime? completedDate);
+	int UpdateTranslator(int id, int resultTypeId, string resultText, byte[] resultAudio, DateTime? completedDate);
+	int UpdateVision(int id, int resultTypeId, string resultText, DateTime? completedDate);
 
-	int Update(ResultBase item);
+	Task<IEnumerable<ResultBase>?> GetTranslatorResultsByRequestAsync(int requestId);
+	Task<IEnumerable<ResultBase>?> GetVisionResultsByRequestAsync(int requestId);
+	Task<IEnumerable<ResultBase>?> GetSpeechResultsByRequestAsync(int requestId);
+	Task<IEnumerable<ResultBase>?> GetLanguageResultsByRequestAsync(int requestId);
 }

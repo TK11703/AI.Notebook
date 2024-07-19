@@ -24,31 +24,21 @@ public class ResultProcessor
 		{
 			Exception ex = new("Result type not found");
 			throw ex;
-		}
-		int resultId = await resultData.InsertAsync(new ResultBase()
-		{
-			RequestId = aRequestModel.RequestId,
-			ResourceId = aRequestModel.ResourceId,
-			ResultTypeId = resultType.Id,
-			CompletedDt = DateTime.Now,
-			ResultData = result.GetResultData()
-		});
-		if (resultId.Equals(0))
-		{
-			Exception ex = new("Failed to save result");
-			throw ex;
-		}
+		}	
 		TranslatorResult resultModel = new TranslatorResult()
 		{
-			ResultId = resultId,
+			RequestId = aRequestModel.Id,
+			ResourceId = aRequestModel.ResourceId,
+			ResultTypeId = resultType.Id,
 			SourceLangCode = aRequestModel.SourceLangCode,
 			TargetLangCode = aRequestModel.TargetLangCode,
 			Input = aRequestModel.Input,
 			Translate = aRequestModel.Translate,
 			Transliterate = aRequestModel.Transliterate,
 			OutputAsAudio = aRequestModel.OutputAsAudio,
-			Ssml = aRequestModel.Ssml,
-			SsmlUrl = aRequestModel.SsmlUrl,			
+			CompletedDt = DateTime.Now,
+			ResultText = result.Output,
+			ResultAudio = result.AudioOutput,
 			VoiceName = aRequestModel.VoiceName
 		};
 		int translatorModelId = await resultData.InsertTranslatorAsync(resultModel);

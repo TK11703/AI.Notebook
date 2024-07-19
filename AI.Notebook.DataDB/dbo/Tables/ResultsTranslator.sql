@@ -14,7 +14,7 @@
 	[ResultAudio] VARBINARY(MAX) NULL,
 	[CreatedDt] DATETIME NOT NULL, 
 	[UpdatedDt] DATETIME NOT NULL, 
-	[CompletedDt] DATETIME NOT NULL,
+	[CompletedDt] DATETIME NULL,
     CONSTRAINT [FK_ResultsTranslator_RequestsTranslator] FOREIGN KEY ([RequestId]) REFERENCES [RequestsTranslator]([Id]),
 	CONSTRAINT [FK_ResultsTranslator_ResultTypes] FOREIGN KEY ([ResultTypeId]) REFERENCES [ResultTypes]([Id])
 )

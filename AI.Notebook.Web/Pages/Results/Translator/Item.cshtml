@@ -17,14 +17,6 @@
 				<div class="card-body">
 					<div class="row mb-3">
 						<div class="col">
-							<label asp-for="ResultModel.SourceLanguage" class="form-label"></label>
-							<input type="text" class="form-control" asp-for="ResultModel.SourceLanguage" readonly>
-						</div>
-						<div class="col">
-							<label asp-for="ResultModel.TargetLanguage" class="form-label"></label>
-							<input type="text" class="form-control" asp-for="ResultModel.TargetLanguage" readonly>
-						</div>
-						<div class="col">
 							<label class="form-label" id="translatorOperation">Requested Operation</label>
 							<select class="form-select" for="translatorOperation" disabled>
 								@{
@@ -36,7 +28,7 @@
 									{
 										<option value="translate">Translate</option>
 									}
-									if(Model.ResultModel.Transliterate)
+									if (Model.ResultModel.Transliterate)
 									{
 										<option value="transliterate" selected>Transliterate</option>
 									}
@@ -45,13 +37,25 @@
 										<option value="transliterate">Transliterate</option>
 									}
 								}
-							</select>							
+							</select>
+						</div>
+						<div class="col">
+							<label asp-for="ResultModel.SourceLanguage" class="form-label"></label>
+							<input type="text" class="form-control" asp-for="ResultModel.SourceLanguage" readonly>
+						</div>
+						<div class="col">
+							<label asp-for="ResultModel.TargetLanguage" class="form-label"></label>
+							<input type="text" class="form-control" asp-for="ResultModel.TargetLanguage" readonly>
 						</div>
 					</div>
 					<div class="row mb-3">
 						<div class="col">
 							<label asp-for="ResultModel.Prompt" class="form-label"></label>
 							<textarea class="form-control" asp-for="ResultModel.Prompt" readonly></textarea>
+						</div>
+						<div class="col">
+							<label asp-for="ResultModel.ResultText" class="form-label"></label>
+							<textarea class="form-control" readonly>@(Model.ResultModel.ResultText)</textarea>
 						</div>
 					</div>
 					<div class="row mb-3">
@@ -82,28 +86,33 @@
 									<input asp-for="ResultModel.VoiceName" type="text" class="form-control" disabled>
 								</div>
 								<div class="col">
-									<label asp-for="ResultModel.Ssml" class="form-label"></label>
-									<textarea class="form-control" asp-for="ResultModel.Ssml" disabled></textarea>
-								</div>
-								<div class="col">
-									<label asp-for="ResultModel.SsmlUrl" class="form-label"></label>
-									<input type="text" class="form-control" asp-for="ResultModel.SsmlUrl" disabled />
+									<label asp-for="ResultModel.ResultAudio" class="form-label"></label>
+									<div class="d-flex align-items-center">
+										<audio controls>
+											<source src="/Downloads/Audio/Translator/@(Model.Id)" type="audio/wav">
+											Your browser does not support the audio element.
+										</audio>
+										<a href="/Downloads/Audio/Translator/@(Model.Id)" class="btn btn-sm btn-outline-secondary ms-2" target="_blank" title="Click to download the generated audio.">
+											<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+												<path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5" />
+												<path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708z" />
+											</svg>
+										</a>
+									</div>
 								</div>
 							</div>
 						}
 					}
 					<div class="row mb-3">
-						<div class="col">
-							@{
-								if (Model.ResultModel != null && Model.ResultModel.ResultType != null && Model.ResultModel.ResultType.Id > 0 
-									&& !string.IsNullOrEmpty(Model.ResultModel.ResultType.Name) && Model.ResultModel.ResultData.Length > 0)
-								{
-									await Html.RenderPartialAsync("_ResultDisplayPartial", Model.ResultModel);
-								}
-							}
+						<div class="col-6 offset-md-3">
+							<div class="alert alert-info" role="alert">
+								Would you like to submit that translation as an Speech Synthesis Markup Language (SSML)? Click the "Submit SSML" to open the SSML modal.
+								<div class="d-flex justify-content-center mt-1">
+									<button id="ssmlButton" type="button" class="btn btn-secondary btn-sm" title="Click to use SSML on this result" data-bs-toggle="modal" data-bs-target="#ssmlModal">Submit SSML</button>
+								</div>
+							</div>
 						</div>
 					</div>
-						
 					<input type="hidden" asp-for="ResultModel.Id" />
 				</div>
 				<div class="card-footer">
@@ -139,10 +148,41 @@
 					<p>Are you sure you wish to delete the result?</p>
 					<p><span class="badge text-bg-danger">CAUTION:</span> This action cannot be undone.</p>
 					<input type="hidden" asp-for="ResultModel.Id" />
-					<input type="hidden" asp-for="ResultModel.ResultId" />
 				</div>
 				<div class="modal-footer">
-					<button type="submit" class="btn btn-danger" title="Click to delete." asp-page-handler="delete" asp-route-id="@Model.ResultModel.Id" asp-route-resultid="@Model.ResultModel.ResultId">Delete</button>
+					<button type="submit" class="btn btn-danger" title="Click to delete." asp-page-handler="delete" asp-route-id="@Model.ResultModel.Id">Delete</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" title="Click to cancel.">Cancel</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="ssmlModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="ssmlModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<form method="post">
+				<div class="modal-header">
+					<h5 class="modal-title" id="aiResourceModalLabel">Submit an SSML Request</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p>Speech Synthesis Markup Language (SSML) is used to specify the text to speech voice, language, name, style, and role for your speech output.</p>
+					<div class="row mb-3">
+						<div class="col">
+							<label asp-for="ResultModel.Ssml" class="form-label"></label>
+							<textarea class="form-control" asp-for="ResultModel.Ssml"></textarea>
+						</div>
+					</div>
+					<div class="row mb-3">
+						<div class="col">
+							<label asp-for="ResultModel.SsmlUrl" class="form-label"></label>
+							<input type="text" class="form-control" asp-for="ResultModel.SsmlUrl" />
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary" title="Click to submit SSML." asp-page-handler="ssmlrequest">Submit</button>
 					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" title="Click to cancel.">Cancel</button>
 				</div>
 			</form>

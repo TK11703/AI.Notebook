@@ -1,7 +1,6 @@
 ﻿namespace AI.Notebook.Common.Entities;
 public class LanguageResult : ResultBase
-{
-	public int ResultId { get; set; }
+{	
 	public string Input { get; set; } = string.Empty;
 	public string? SourceLangCode { get; set; }
 	public string TargetLangCode { get; set; } = string.Empty;
@@ -14,4 +13,5 @@ public class LanguageResult : ResultBase
 	public bool NamedEntityRecognition { get; set; } = false;
 	public bool Summary { get; set; } = false;
 	public bool AbstractiveSummary { get; set; } = false;
+	public string? ResultText { get; set; }
 }

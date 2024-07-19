@@ -3,19 +3,19 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace AI.Notebook.API.Endpoints.Translator.DeleteResult;
 
-public class DeleteTranslationResultById : IEndpoint
+public class DeleteTranslationRequestById : IEndpoint
 {
 	public void MapEndpoint(IEndpointRouteBuilder app)
 	{
-		app.MapDelete($"/Translator/Result/{{id}}/{{resultId}}", HandleAsync)
-			.WithTags(Tags.AIResults);
+		app.MapDelete($"/Translator/Result/{{id}}", HandleAsync)
+			.WithTags(Tags.Translator);
 	}
 
-	protected virtual async Task<Results<Ok<bool>, ProblemHttpResult>> HandleAsync(int id, int resultId, IResultData resultData)
+	protected virtual async Task<Results<Ok<bool>, ProblemHttpResult>> HandleAsync(int id, IResultData resultData)
 	{
 		try
 		{
-			var completed = await resultData.DeleteTranslatorResultAsync(id, resultId);
+			var completed = await resultData.DeleteTranslatorResultAsync(id);
 			return TypedResults.Ok(completed);
 		}
 		catch (Exception ex)

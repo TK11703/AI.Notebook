@@ -38,7 +38,7 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 		[Display(Name = "Target Language")]
 		public SelectList? TargetLanguageList { get; set; }
 
-		public IEnumerable<ResultBase> Results { get; set; } = null!;
+		public IEnumerable<ResultBase>? Results { get; set; } = null!;
 
 		public TranslatorRequestModel RequestFormModel { get; set; }
 
@@ -63,14 +63,12 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 							Translate = requestModel.Translate,
 							Transliterate = requestModel.Transliterate,
 							OutputAsAudio = requestModel.OutputAsAudio,
-							Ssml = requestModel.Ssml,
-							SsmlUrl = requestModel.SsmlUrl,
 							VoiceName = requestModel.VoiceName,
 							CreatedDt = requestModel.CreatedDt,
 							UpdatedDt = requestModel.UpdatedDt
 						};
 
-						Results = await _resultClient.GetByRequest(Id);
+						Results = await _translatorClient.GetTranslatorResultsByRequest(Id);
 					}
 					else
 					{
@@ -95,7 +93,6 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 				TranslatorRequest item = new TranslatorRequest()
 				{
 					Id = RequestFormModel.Id,
-					RequestId = RequestFormModel.Id,
 					ResourceId = RequestFormModel.ResourceId,
 					Name = RequestFormModel.Name,
 					Input = RequestFormModel.Prompt,
@@ -105,8 +102,6 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 					Transliterate = RequestFormModel.Transliterate,
 					VoiceName = RequestFormModel.VoiceName,
 					OutputAsAudio = RequestFormModel.OutputAsAudio,
-					Ssml = RequestFormModel.Ssml,
-					SsmlUrl = RequestFormModel.SsmlUrl
 				};
 				try
 				{
@@ -144,7 +139,6 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 				TranslatorRequest item = new TranslatorRequest()
 				{
 					Id = RequestFormModel.Id,
-					RequestId = RequestFormModel.Id,
 					ResourceId = RequestFormModel.ResourceId,
 					Name = RequestFormModel.Name,
 					Input = RequestFormModel.Prompt,
@@ -154,8 +148,6 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 					Transliterate = RequestFormModel.Transliterate,
 					VoiceName = RequestFormModel.VoiceName,
 					OutputAsAudio = RequestFormModel.OutputAsAudio,
-					Ssml = RequestFormModel.Ssml,
-					SsmlUrl = RequestFormModel.SsmlUrl
 				};
 				try
 				{
@@ -200,7 +192,7 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 			{
 				try
 				{
-					await _requestClient.Delete(Id);
+					await _translatorClient.DeleteRequest(Id);
 					HttpContext.Session.SetString("Notification", $"The request was deleted successfully.");
 					return RedirectToPage("/Requests/Index");
 				}

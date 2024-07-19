@@ -1,7 +1,6 @@
 ﻿namespace AI.Notebook.Common.Entities;
 public class SpeechResult : ResultBase
 {
-	public int ResultId { get; set; }
 	public string? AudioUrl { get; set; }
 	public byte[]? AudioData { get; set; }
 	public string? Ssml { get; set; }
@@ -12,4 +11,6 @@ public class SpeechResult : ResultBase
 	public bool Transcribe { get; set; } = false;
 	public bool Translate { get; set; } = false;
 	public bool OutputAsAudio { get; set; } = false;
+	public string? ResultText { get; set; }
+	public byte[]? ResultAudio { get; set; }
 }

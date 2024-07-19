@@ -116,6 +116,10 @@
     <Build Include="dbo\Stored Procedures\spResultsTranslator_Update.sql" />
     <Build Include="dbo\Stored Procedures\spResultsSpeech_Update.sql" />
     <Build Include="dbo\Stored Procedures\spResultsLanguage_Update.sql" />
+    <Build Include="dbo\Stored Procedures\spResultsLanguage_GetByRequest.sql" />
+    <Build Include="dbo\Stored Procedures\spResultsSpeech_GetByRequest.sql" />
+    <Build Include="dbo\Stored Procedures\spResultsTranslator_GetByRequest.sql" />
+    <Build Include="dbo\Stored Procedures\spResultsVision_GetByRequest.sql" />
   </ItemGroup>
   <ItemGroup>
     <PostDeploy Include="Script.PostDeployment.sql" />

@@ -20,16 +20,16 @@
 					<div asp-validation-summary="ModelOnly" class="text-danger"></div>
 					<div class="row">
 						<div class="col">
-							<label asp-for="RequestFormModel.Name" class="form-label"></label>
-							<input type="text" class="form-control" asp-for="RequestFormModel.Name">
-							<p class="text-muted small">Enter a name to identify this request.</p>
-							<span asp-validation-for="RequestFormModel.Name" class="text-danger"></span>
-						</div>
-						<div class="col">
 							<label class="form-label" asp-for="RequestFormModel.ResourceId"></label>
 							<select asp-for="RequestFormModel.ResourceId" asp-items="Model.AIResourceList" class="form-select" style="width: 100%" disabled></select>
 							<p class="text-muted small">An AI resource can only be selected on creation.</p>
 							<input type="hidden" asp-for="RequestFormModel.ResourceId" />
+						</div>
+						<div class="col">
+							<label asp-for="RequestFormModel.Name" class="form-label"></label>
+							<input type="text" class="form-control" asp-for="RequestFormModel.Name">
+							<p class="text-muted small">Enter a name to identify this request.</p>
+							<span asp-validation-for="RequestFormModel.Name" class="text-danger"></span>
 						</div>
 					</div>
 					<ul class="nav nav-underline mb-3" id="functionTabs" role="tablist">

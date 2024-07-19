@@ -4,7 +4,7 @@ namespace AI.Notebook.Web.Models;
 
 public class TranslatorResultModel : ResultModelBase
 {
-	public int ResultId { get; set; } = 0;
+	public int RequestId { get; set; } = 0;
 
 	[Display(Name = "Source Text")]
 	public string? Prompt { get; set; } = string.Empty;
@@ -29,6 +29,12 @@ public class TranslatorResultModel : ResultModelBase
 
 	[Display(Name = "Voice Name")]
 	public string? VoiceName { get; set; } = string.Empty;
+
+	[Display(Name = "Translated Text")]
+	public string? ResultText { get; set; }
+
+	[Display(Name = "Translated Audio")]
+	public byte[]? ResultAudio { get; set; }
 
 	[Display(Name = "Ssml")]
 	public string? Ssml { get; set; } = string.Empty;

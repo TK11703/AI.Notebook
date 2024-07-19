@@ -48,13 +48,13 @@ namespace AI.Notebook.Web.Pages.Results.Translator
 			return Page();			
 		}
 
-		public async Task<IActionResult> OnPostDeleteAsync(int Id, int ResultId)
+		public async Task<IActionResult> OnPostDeleteAsync(int Id)
 		{
 			if (Id > 0)
 			{
 				try
 				{
-					var completed = await _translatorClient.Delete(Id, ResultId);
+					var completed = await _translatorClient.DeleteResult(Id);
 					if (completed)
 					{
 						HttpContext.Session.SetString("Notification", $"The request was deleted successfully.");
@@ -81,28 +81,67 @@ namespace AI.Notebook.Web.Pages.Results.Translator
 			}
 		}
 
+		public async Task<IActionResult> OnPostSSMLRequestAsync()
+		{
+			FormCollection form = (FormCollection)await Request.ReadFormAsync();
+			if (form != null)
+			{
+				if(string.IsNullOrEmpty(form["ResultModel.Ssml"].ToString()))
+				{
+					HttpContext.Session.SetString("Error", $"The SSML request was not generated successfully.");
+					return RedirectToPage();
+				}
+				try
+				{
+					SsmlRequest request = new SsmlRequest();
+					request.Ssml = form["ResultModel.Ssml"].ToString();
+					byte[]? result = await _translatorClient.GenerateSsml(request);
+					if (result.Length > 0)
+					{
+						return File(result, "audio/wav", "audioDownload.wav");
+					}
+					else
+					{
+						HttpContext.Session.SetString("Error", $"The SSML request was NOT generated successfully.");
+						return RedirectToPage();
+					}
+				}
+				catch (Exception ex)
+				{
+					_logger.LogError(ex, "The SSML request was not generated successfully.");
+					HttpContext.Session.SetString("Error", $"The SSML Request was not generated successfully.");
+					return RedirectToPage();
+				}
+			}
+			else
+			{
+				//log error and respond with a bad request
+				HttpContext.Session.SetString("Error", $"The SSML request was not generated successfully.");
+				return RedirectToPage();
+			}
+		}
+
 		private async Task PopulateModelAsync(TranslatorResult result)
 		{	
 			ResultModel = new TranslatorResultModel()
 			{
 				Id = result.Id,
-				ResultId = result.ResultId,
+				RequestId = result.RequestId,
 				ResourceId = result.ResourceId,
 				AIResource = result.AIResource,
 				ResultTypeId = result.ResultTypeId,
 				ResultType = result.ResultType,
-				ResultData = result.ResultData,
 				CompletedDt = result.CompletedDt,
 
 				Prompt = result.Input,
-				//SourceLanguage = result.SourceLangCode,
-				//TargetLanguage = result.TargetLangCode,
+				SourceLanguage = result.SourceLangCode,
+				TargetLanguage = result.TargetLangCode,
 				Translate = result.Translate,
 				Transliterate = result.Transliterate,
 				OutputAsAudio = result.OutputAsAudio,
 				VoiceName = result.VoiceName,
-				Ssml = result.Ssml,
-				SsmlUrl = result.SsmlUrl,
+				ResultText = result.ResultText,
+				ResultAudio = result.ResultAudio,
 
 				CreatedDt = result.CreatedDt,
 				UpdatedDt = result.UpdatedDt

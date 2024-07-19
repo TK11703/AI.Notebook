@@ -1,8 +1,5 @@
-﻿using AI.Notebook.Common.Entities;
-using AI.Notebook.Web.Clients;
+﻿using AI.Notebook.Web.Clients;
 using AI.Notebook.Web.Extensions;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace AI.Notebook.Web.FileHandlers;
 
@@ -10,16 +7,16 @@ public class AudioDownload : IFileHandler
 {
 	public void MapEndpoint(IEndpointRouteBuilder app)
 	{
-		app.MapGet($"/Downloads/Audio/{{resultsId}}", HandleAsync).WithTags("Files");
+		app.MapGet($"/Downloads/Audio/Translator/{{id}}", HandleTranslatorAsync).WithTags("Files");
 	}
 
-	protected virtual async Task<IResult> HandleAsync(int resultsId, ResultsClient resultsClient)
+	protected virtual async Task<IResult> HandleTranslatorAsync(int id, TranslatorClient client)
 	{
 		try
 		{
-			var resultItem = await resultsClient.Get(resultsId);
+			var resultItem = await client.GetTranslationResult(id);
 
-			return Results.File(resultItem.ResultData, "audio/wav", "audioDownload.wav");
+			return Results.File(resultItem.ResultAudio, "audio/wav", "audioDownload.wav");
 		}
 		catch (Exception ex)
 		{
