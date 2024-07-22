@@ -148,10 +148,10 @@ namespace AI.Notebook.Web.Pages.Results.Translator
 			};
 
 			SupportedLanguagesResult? langResult = await _translatorClient.GetTranslatorLanguages();
-			if (langResult != null && langResult.SupportedLanguages != null)
+			if (langResult != null && langResult.SupportedTranslationLanguages != null)
 			{
-				ResultModel.SourceLanguage = langResult.SupportedLanguages.FirstOrDefault(x => x.Key == result.SourceLangCode)?.Name;
-				ResultModel.TargetLanguage = langResult.SupportedLanguages.FirstOrDefault(x => x.Key == result.TargetLangCode)?.Name;
+				ResultModel.SourceLanguage = langResult.SupportedTranslationLanguages.FirstOrDefault(x => x.Key == result.SourceLangCode)?.Name;
+				ResultModel.TargetLanguage = langResult.SupportedTranslationLanguages.FirstOrDefault(x => x.Key == result.TargetLangCode)?.Name;
 			}
 		}
 	}

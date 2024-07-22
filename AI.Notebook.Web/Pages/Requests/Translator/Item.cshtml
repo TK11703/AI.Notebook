@@ -32,40 +32,6 @@
 							<span asp-validation-for="RequestFormModel.Name" class="text-danger"></span>
 						</div>
 					</div>
-					<ul class="nav nav-underline mb-3" id="functionTabs" role="tablist">
-						<li class="nav-item" role="presentation">
-							<button class="nav-link @(Model.RequestFormModel.Translate?"active":"")" id="translate-tab" data-bs-toggle="tab" data-bs-target="#translate-tab-pane" type="button" role="tab" aria-controls="translate-tab-pane" aria-selected="@(Model.RequestFormModel.Translate?"true":"false")">Translate</button>
-						</li>
-						<li class="nav-item" role="presentation">
-							<button class="nav-link @(Model.RequestFormModel.Transliterate?"active":"")" id="transliterate-tab" data-bs-toggle="tab" data-bs-target="#transliterate-tab-pane" type="button" role="tab" aria-controls="transliterate-tab-pane" aria-selected="@(Model.RequestFormModel.Transliterate?"true":"false")" disabled>Transliterate</button>
-						</li>
-					</ul>
-					<input type="hidden" asp-for="RequestFormModel.Translate" value="true" />
-					<input type="hidden" asp-for="RequestFormModel.Transliterate" value="false" />
-					<div class="tab-content" id="myTabContent">
-						<div class="tab-pane fade @(Model.RequestFormModel.Translate?"show active":"")" id="translate-tab-pane" role="tabpanel" aria-labelledby="translate-tab" tabindex="0">
-							<div class="row mb-3">
-								<div class="col">
-									<label asp-for="RequestFormModel.SourceLanguage" class="form-label"></label>
-									<select id="sourceLangSelection" asp-for="RequestFormModel.SourceLanguage" asp-items="@Model.SourceLanguageList" class="form-select" style="width: 100%"></select>
-									<p class="text-muted small">What is the source language?</p>
-									<span asp-validation-for="RequestFormModel.SourceLanguage" class="text-danger"></span>
-								</div>
-								<div class="col">
-									<label asp-for="RequestFormModel.TargetLanguage" class="form-label"></label>
-									<select id="targetLangSelection" asp-for="RequestFormModel.TargetLanguage" asp-items="@Model.TargetLanguageList" class="form-select" style="width: 100%"></select>
-									<p class="text-muted small">What is the desired language?</p>
-									<span asp-validation-for="RequestFormModel.TargetLanguage" class="text-danger"></span>
-								</div>
-							</div>
-						</div>
-						<div class="tab-pane fade @(Model.RequestFormModel.Transliterate?"show active":"")" id="transliterate-tab-pane" role="tabpanel" aria-labelledby="transliterate-tab" tabindex="0">
-							<div class="alert alert-warning" role="alert">
-								Transliteration is not currently functional.
-							</div>
-						</div>
-					</div>					
-
 					<div class="row mb-3">
 						<div class="col">
 							<label asp-for="RequestFormModel.Prompt" class="form-label"></label>
@@ -73,9 +39,56 @@
 							<p class="text-muted small">Enter the source text.</p>
 							<span asp-validation-for="RequestFormModel.Prompt" class="text-danger"></span>
 						</div>
+						<div class="col">
+							<label asp-for="RequestFormModel.SourceLanguage" class="form-label"></label>
+							<select id="sourceLangSelection" asp-for="RequestFormModel.SourceLanguage" asp-items="@Model.SourceLanguageList" class="form-select" style="width: 100%"></select>
+							<p class="text-muted small">What is the source language?</p>
+							<span asp-validation-for="RequestFormModel.SourceLanguage" class="text-danger"></span>
+						</div>
 					</div>
 					<div class="row mb-3">
 						<div class="col">
+							<label class="form-label">Translator Function</label>
+							<div class="form-check">
+								@{
+									if(Model.RequestFormModel.Translate)
+									{
+										<input class="form-check-input" type="radio" name="translatorFunction" id="translateSelection" value="translate" checked />
+									}
+									else
+									{
+										<input class="form-check-input" type="radio" name="translatorFunction" id="translateSelection" value="translate" />
+									}
+								}								
+								<label class="form-check-label" for="translateSelection">
+									Translation
+								</label>
+							</div>
+							<div class="form-check">
+								@{
+									if (Model.RequestFormModel.Transliterate)
+									{
+										<input class="form-check-input" type="radio" name="translatorFunction" id="transliterateSelection" value="transliterate" checked />
+									}
+									else
+									{
+										<input class="form-check-input" type="radio" name="translatorFunction" id="transliterateSelection" value="transliterate" />
+									}
+								}
+								<label class="form-check-label" for="transliterateSelection">
+									Transliteration
+								</label>
+							</div>
+							<input type="hidden" asp-for="RequestFormModel.Translate" value="true" />
+							<input type="hidden" asp-for="RequestFormModel.Transliterate" value="false" />
+						</div>
+						<div class="col translate">
+							<label asp-for="RequestFormModel.TargetLanguage" class="form-label"></label>
+							<select id="targetLangSelection" asp-for="RequestFormModel.TargetLanguage" asp-items="@Model.TargetLanguageList" class="form-select" style="width: 100%"></select>
+							<p class="text-muted small">What is the desired language?</p>
+							<span asp-validation-for="RequestFormModel.TargetLanguage" class="text-danger"></span>
+						</div>
+						<div class="col translate">
 							<label class="form-label">Preferred Output</label>
 							<div>
 								<div class="form-check form-check-inline">
@@ -83,10 +96,6 @@
 									<label class="form-check-label" asp-for="RequestFormModel.OutputAsAudio"></label>
 								</div>
 							</div>
-						</div>
-					</div>
-					<div class="row mb-3">
-						<div class="col">
 							<label asp-for="RequestFormModel.VoiceName" class="form-label"></label>
 							@{
 								if (Model.RequestFormModel.OutputAsAudio)
@@ -98,43 +107,25 @@
 									<input asp-for="RequestFormModel.VoiceName" type="text" class="form-control" disabled>
 								}
 							}
-							<p class="text-muted small">Enter a text-to-speech voice name.<br />
+							<p class="text-muted small">
+								Enter a text-to-speech voice name.<br />
 								Click to view <a href="https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts" target="_blank">a list of voices.</a>
-							</p>							
+							</p>
 							<span asp-validation-for="RequestFormModel.VoiceName" class="text-danger"></span>
 						</div>
-						<div class="col">
-							<label asp-for="RequestFormModel.Ssml" class="form-label"></label>
-							@{
-								if (Model.RequestFormModel.OutputAsAudio)
-								{
-									<textarea class="form-control" asp-for="RequestFormModel.Ssml"></textarea>
-								}
-								else
-								{
-									<textarea class="form-control" asp-for="RequestFormModel.Ssml" disabled></textarea>
-								}
-							}
-							<p class="text-muted small">Enter the SSML text to use for this request.</p>
-							<span asp-validation-for="RequestFormModel.Ssml" class="text-danger"></span>
+						<div class="col transliterate">
+							<label asp-for="RequestFormModel.SourceScript" class="form-label"></label>
+							<select id="sourceScriptSelection" asp-for="RequestFormModel.SourceScript" asp-items="@Model.SourceScriptList" class="form-select" style="width: 100%"></select>
+							<p class="text-muted small">What is the source Script?</p>
+							<span asp-validation-for="RequestFormModel.SourceScript" class="text-danger"></span>
 						</div>
-						<div class="col">
-							<label asp-for="RequestFormModel.SsmlUrl" class="form-label"></label>
-							@{
-								if (Model.RequestFormModel.OutputAsAudio)
-								{
-									<input type="text" class="form-control" asp-for="RequestFormModel.SsmlUrl" />
-								}
-								else
-								{
-									<input type="text" class="form-control" asp-for="RequestFormModel.SsmlUrl" disabled />
-								}
-							}
-							<p class="text-muted small">Enter an accessible url for an SSML file.</p>
-							<span asp-validation-for="RequestFormModel.SsmlUrl" class="text-danger"></span>
+						<div class="col transliterate">
+							<label asp-for="RequestFormModel.TargetScript" class="form-label"></label>
+							<select id="targetScriptSelection" asp-for="RequestFormModel.TargetScript" asp-items="@Model.TargetScriptList" class="form-select" style="width: 100%"></select>
+							<p class="text-muted small">What is the desired script?</p>
+							<span asp-validation-for="RequestFormModel.TargetScript" class="text-danger"></span>
 						</div>
 					</div>
-
 					<input type="hidden" asp-for="RequestFormModel.Id" />
 				</div>
 				<div class="card-footer">
@@ -158,11 +149,11 @@
 							@{
 								if (Model.Id > 0 && Model.RequestFormModel.CreatedDt.HasValue)
 								{
-									<h6>Created On <span class="badge text-bg-secondary">@Model.RequestFormModel.CreatedDt.ToString()</span></h6>
+										<h6>Created On <span class="badge text-bg-secondary">@Model.RequestFormModel.CreatedDt.ToString()</span></h6>
 								}
 								if (Model.Id > 0 && Model.RequestFormModel.UpdatedDt.HasValue)
 								{
-									<h6>Last Updated <span class="badge text-bg-secondary">@Model.RequestFormModel.UpdatedDt.ToString()</span></h6>
+										<h6>Last Updated <span class="badge text-bg-secondary">@Model.RequestFormModel.UpdatedDt.ToString()</span></h6>
 								}
 							}
 						</div>
@@ -255,38 +246,71 @@
 			$('#aiResourceSelection').select2({ "multiple": false, width: 'resolve', theme: 'bootstrap4' });
 			$('#sourceLangSelection').select2({ "multiple": false, width: 'resolve', theme: 'bootstrap4' });
 			$('#targetLangSelection').select2({ "multiple": false, width: 'resolve', theme: 'bootstrap4' });
+			$('#sourceScriptSelection').select2({ "multiple": false, width: 'resolve', theme: 'bootstrap4' });
+			$('#targetScriptSelection').select2({ "multiple": false, width: 'resolve', theme: 'bootstrap4' });
+
+			if (!$("#translateSelection").is(":checked") && !$("#transliterateSelection").is(":checked")) {
+				$(".translate").hide();
+				$("#RequestFormModel_Translate").val(false);
+				$(".transliterate").hide();
+				$("#RequestFormModel_Transliterate").val(false);
+			}
+			else if ($("#translateSelection").is(":checked")) {
+				$(".translate").show();
+				$("#RequestFormModel_Translate").val(true);
+				$(".transliterate").hide();
+				$("#RequestFormModel_Transliterate").val(false);
+			}
+			else
+			{
+				$(".translate").hide();
+				$("#RequestFormModel_Translate").val(false);
+				$(".transliterate").show();
+				$("#RequestFormModel_Transliterate").val(true);
+			}
+
+			$('#sourceLangSelection').on('select2:select', function (e) {
+				var langName = e.params.data.text;
+				var langCode = e.params.data.id;
+				$('#sourceScriptSelection').find("optgroup[label='" + langName + "'] option").prop('disabled', false).trigger('change');
+				$('#sourceScriptSelection').find("optgroup[label!='" + langName + "'] option").prop('disabled', true).trigger('change');
+
+				$('#targetScriptSelection').find("optgroup[label='" + langName + "'] option").prop('disabled', false).trigger('change');
+				$('#targetScriptSelection').find("optgroup[label!='" + langName + "'] option").prop('disabled', true).trigger('change');
+
+			});
+
+			// $('#sourceScriptSelection').on('select2:select', function (e) {
+
+			// 	var scriptName = e.params.data.text;
+			// 	var scriptCode = e.params.data.id;
+
+			// 	$('#targetScriptSelection').find("optgroup[label='" + langName + "'] option[value='" + scriptCode +"']").prop('disabled', false).trigger('change');
+			// 	$('#targetScriptSelection').find("optgroup[label!='" + langName + "'] option").prop('disabled', true).trigger('change');
+			// });
 
 			$("#RequestFormModel_OutputAsAudio").on("change", function () {
 				$("#RequestFormModel_VoiceName").prop("disabled", !$(this).is(":checked"));
-				$("#RequestFormModel_Ssml").prop("disabled", !$(this).is(":checked"));
-				$("#RequestFormModel_SsmlUrl").prop("disabled", !$(this).is(":checked"));
-			});
-			$('button[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
-				switch (e.target.id) {
-					case "translate-tab":
-						$("#RequestFormModel_Translate").val(true); break;
-					case "transliterate-tab":
-						$("#RequestFormModel_Transliterate").val(true); break;
-				}
-			}).on('hidden.bs.tab', function (e) {
-				switch (e.target.id) {
-					case "translate-tab":
-						$("#RequestFormModel_Translate").val(false); break;
-					case "transliterate-tab":
-						$("#RequestFormModel_Transliterate").val(false); break;
-				}
 			});
 
-			var radioBtns = $("input[name^='TranslatorFunction']");
-			radioBtns.change(function () {
-				$(this).siblings("input[type=hidden]").val($(this).is(":checked"));
-				// Attach custom event and handler to all other radio buttons in the same group.
-				radioBtns.not(':checked').off('deselect').on('deselect', function () {
-					$(this).each(function (i, e) {
-						$(e).siblings("input[type=hidden]").val($(this).is(":checked"));
-					});
-				}).trigger('deselect'); // Immediately trigger this custom event.
+			$("#translateSelection").on("change", function () {
+				$("#RequestFormModel_Translate").val($(this).prop("checked"));
+				$("#RequestFormModel_Transliterate").val(!$(this).prop("checked"));
+				$(".translate").show();
+				$(".transliterate").hide();
+				$('#sourceScriptSelection').val("").trigger('change');
+				$('#targetScriptSelection').val("").trigger('change');
+			});
+			
+			$("#transliterateSelection").on("change", function () {
+				$("#RequestFormModel_Translate").val(!$(this).prop("checked"));
+				$("#RequestFormModel_Transliterate").val($(this).prop("checked"));
+				$(".translate").hide();
+				$('#targetLangSelection').val("").trigger('change');
+				$(".transliterate").show();
 			});
 		});
+
+
 	</script>
 }

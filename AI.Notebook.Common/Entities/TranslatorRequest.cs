@@ -2,7 +2,9 @@
 public class TranslatorRequest : RequestBase
 {
 	public string? SourceLangCode { get; set; }
+	public string? SourceScriptCode { get; set; }
 	public string TargetLangCode { get; set; } = string.Empty;
+	public string TargetScriptCode { get; set; } = string.Empty;
 	public string Input { get; set; } = string.Empty;
 	public bool Translate { get; set; } = false;
 	public bool Transliterate { get; set; } = false;

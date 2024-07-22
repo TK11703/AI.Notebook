@@ -6,11 +6,12 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace AI.Notebook.Web.Pages.Requests.Translator
 {
 	public class ItemModel : PageModel
-    {
+	{
 		private readonly AIResourcesClient _resourceClient;
 		private readonly RequestsClient _requestClient;
 		private readonly ResultsClient _resultClient;
@@ -19,7 +20,7 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 		public ItemModel(AIResourcesClient resourceClient, ILogger<ItemModel> logger, RequestsClient requestClient, ResultsClient resultClient, TranslatorClient translatorClient)
 		{
 			_resourceClient = resourceClient;
-			_logger = logger;			
+			_logger = logger;
 			_requestClient = requestClient;
 			_resultClient = resultClient;
 			_translatorClient = translatorClient;
@@ -35,8 +36,14 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 		[Display(Name = "Source Language")]
 		public SelectList? SourceLanguageList { get; set; }
 
+		[Display(Name = "Source Script")]
+		public SelectList? SourceScriptList { get; set; }
+
 		[Display(Name = "Target Language")]
 		public SelectList? TargetLanguageList { get; set; }
+
+		[Display(Name = "Target Script")]
+		public SelectList? TargetScriptList { get; set; }
 
 		public IEnumerable<ResultBase>? Results { get; set; } = null!;
 
@@ -50,7 +57,7 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 				try
 				{
 					var requestModel = await _translatorClient.GetTranslatorRequest(Id);
-					if(requestModel != null)
+					if (requestModel != null)
 					{
 						RequestFormModel = new TranslatorRequestModel()
 						{
@@ -59,7 +66,9 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 							ResourceId = requestModel.ResourceId,
 							Prompt = requestModel.Input,
 							TargetLanguage = requestModel.TargetLangCode,
+							TargetScript = requestModel.TargetScriptCode,
 							SourceLanguage = requestModel.SourceLangCode,
+							SourceScript = requestModel.SourceScriptCode,
 							Translate = requestModel.Translate,
 							Transliterate = requestModel.Transliterate,
 							OutputAsAudio = requestModel.OutputAsAudio,
@@ -97,7 +106,9 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 					Name = RequestFormModel.Name,
 					Input = RequestFormModel.Prompt,
 					TargetLangCode = RequestFormModel.TargetLanguage,
+					TargetScriptCode = RequestFormModel.TargetScript,
 					SourceLangCode = RequestFormModel.SourceLanguage,
+					SourceScriptCode = RequestFormModel.SourceScript,
 					Translate = RequestFormModel.Translate,
 					Transliterate = RequestFormModel.Transliterate,
 					VoiceName = RequestFormModel.VoiceName,
@@ -143,7 +154,9 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 					Name = RequestFormModel.Name,
 					Input = RequestFormModel.Prompt,
 					TargetLangCode = RequestFormModel.TargetLanguage,
+					TargetScriptCode = RequestFormModel.TargetScript,
 					SourceLangCode = RequestFormModel.SourceLanguage,
+					SourceScriptCode = RequestFormModel.SourceScript,
 					Translate = RequestFormModel.Translate,
 					Transliterate = RequestFormModel.Transliterate,
 					VoiceName = RequestFormModel.VoiceName,
@@ -161,7 +174,7 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 						{
 							await _translatorClient.Transliterate(item);
 						}
-						
+
 						HttpContext.Session.SetString("Notification", $"The request was executed successfully.");
 						return RedirectToPage();
 					}
@@ -220,10 +233,18 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 			}
 
 			SupportedLanguagesResult? langResult = await _translatorClient.GetTranslatorLanguages();
-			if (langResult != null && langResult.SupportedLanguages != null)
+			if (langResult != null)
 			{
-				SourceLanguageList = CreateSelectList(langResult.SupportedLanguages, x => x.Key, x => x.Name);
-				TargetLanguageList = CreateSelectList(langResult.SupportedLanguages, x => x.Key, x => x.Name);
+				if (langResult.SupportedTranslationLanguages != null)
+				{
+					SourceLanguageList = CreateSelectList(langResult.SupportedTranslationLanguages, x => x.Key, x => x.Name);
+					TargetLanguageList = CreateSelectList(langResult.SupportedTranslationLanguages, x => x.Key, x => x.Name);
+				}
+				if (langResult.SupportedTransliterationLanguages != null)
+				{
+					SourceScriptList = CreateSourceScriptGroupedSelectList(langResult.SupportedTransliterationLanguages);
+					TargetScriptList = CreateTargetScriptGroupedSelectList(langResult.SupportedTransliterationLanguages);
+				}
 			}
 		}
 
@@ -241,6 +262,43 @@ namespace AI.Notebook.Web.Pages.Requests.Translator
 				}));
 			}
 			return new SelectList(options, "Value", "Text");
+		}
+
+		private SelectList CreateSourceScriptGroupedSelectList(List<SupportedTransliterationLanguage> languages)
+		{
+			var options = new List<SelectListItem>();
+			var group = new SelectListGroup { Name = "Select a Source Script" };
+			options.Add(new SelectListItem { Value = "", Text = "Select an item", Group=group });
+			foreach (var language in languages)
+			{
+				group = new SelectListGroup { Name = language.Name };
+				foreach (var script in language.Scripts)
+				{
+					options.Add(new SelectListItem { Value = script.Key, Text = script.Name, Group = group });
+				}
+			}
+
+			return new SelectList(options, "Value", "Text", null, "Group.Name");
+		}
+
+		private SelectList CreateTargetScriptGroupedSelectList(List<SupportedTransliterationLanguage> languages)
+		{
+			var options = new List<SelectListItem>();
+			var group = new SelectListGroup { Name = "Select a Target Script" };
+			options.Add(new SelectListItem { Value = "", Text = "Select an item", Group = group });
+			foreach (var language in languages)
+			{
+				group = new SelectListGroup { Name = language.Name };
+				foreach (var script in language.Scripts)
+				{
+					foreach (var toScript in script.ToScripts)
+					{
+						options.Add(new SelectListItem { Value = toScript.Key, Text = toScript.Name, Group = group });
+					}
+				}
+			}
+
+			return new SelectList(options, "Value", "Text",null, "Group.Name");
 		}
 
 		private bool IsValid(TranslatorRequest item)

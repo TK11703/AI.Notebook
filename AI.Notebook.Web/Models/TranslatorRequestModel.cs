@@ -13,9 +13,14 @@ public class TranslatorRequestModel : RequestNewModel
 	[Display(Name = "Source Language")]	
 	public string? SourceLanguage { get; set; } = string.Empty;
 
-	[Required]
+	[Display(Name = "Source Script")]
+	public string? SourceScript { get; set; } = string.Empty;
+	
 	[Display(Name = "Target Language")]	
 	public string? TargetLanguage { get; set; } = string.Empty;
+
+	[Display(Name = "Target Script")]
+	public string? TargetScript { get; set; } = string.Empty;
 
 	[Display(Name = "Translate")]
 	public bool Translate { get; set; } = false;
@@ -28,10 +33,4 @@ public class TranslatorRequestModel : RequestNewModel
 
 	[Display(Name = "Voice Name")]
 	public string? VoiceName { get; set; } = string.Empty;
-
-	[Display(Name = "Ssml")]
-	public string? Ssml { get; set; } = string.Empty;
-
-	[Display(Name = "Ssml Url")]
-	public string? SsmlUrl { get; set; } = string.Empty;
 }

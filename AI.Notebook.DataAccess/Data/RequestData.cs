@@ -122,7 +122,9 @@ public class RequestData : IRequestData
 		p.Add(name: "@ResourceId", item.ResourceId);
 		p.Add(name: "@Name", item.Name);
 		p.Add(name: "@SourceLangCode", item.SourceLangCode);
+		p.Add(name: "@SourceScriptCode", item.SourceScriptCode);
 		p.Add(name: "@TargetLangCode", item.TargetLangCode);
+		p.Add(name: "@TargetScriptCode", item.TargetScriptCode);
 		p.Add(name: "@Input", item.Input);
 		p.Add(name: "@Translate", item.Translate);
 		p.Add(name: "@Transliterate", item.Transliterate);
@@ -207,7 +209,7 @@ public class RequestData : IRequestData
 
 	public int UpdateTranslator(TranslatorRequest item)
 	{
-		dynamic parameters = new { item.Name, item.Id, item.SourceLangCode, item.TargetLangCode, item.Input, item.Translate, item.Transliterate, item.OutputAsAudio, item.VoiceName };
+		dynamic parameters = new { item.Name, item.Id, item.SourceLangCode, item.SourceScriptCode, item.TargetLangCode, item.TargetScriptCode, item.Input, item.Translate, item.Transliterate, item.OutputAsAudio, item.VoiceName };
 		return _dataAccess.SaveData<dynamic>("dbo.spRequestsTranslator_Update", parameters);
 	}
 

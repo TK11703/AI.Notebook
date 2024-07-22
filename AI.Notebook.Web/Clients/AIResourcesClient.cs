@@ -2,7 +2,7 @@
 
 namespace AI.Notebook.Web.Clients;
 
-public sealed class AIResourcesClient : IAIResourcesClient
+public sealed class AIResourcesClient
 {
 	private readonly HttpClient _httpClient;
 	private readonly ILogger<AIResourcesClient> _logger;

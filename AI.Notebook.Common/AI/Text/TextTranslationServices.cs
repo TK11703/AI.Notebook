@@ -19,59 +19,63 @@ public class TextTranslationServices
 		GetSupportedLanguagesResult response = await _translationClient.GetSupportedLanguagesAsync(scope:scope);
 		SupportedLanguagesResult result = new SupportedLanguagesResult() {
 			TranslationLanguages = response.Translation.Count,
-			TransliterationLanguages = response.Transliteration.Count,
-			DictionaryLanguages = response.Dictionary.Count
+			TransliterationLanguages = response.Transliteration.Count
 		};
 		foreach(var language in response.Translation)
 		{
-			if(!result.SupportedLanguages.Exists(x=>x.Key == language.Key))
+			if(!result.SupportedTranslationLanguages.Exists(x=>x.Key == language.Key))
 			{
-				result.SupportedLanguages.Add(new SupportedLanguage()
+				result.SupportedTranslationLanguages.Add(new SupportedTranslationLanguage()
 				{
 					Key = language.Key,
 					Name = language.Value.Name,
-					SupportsTranslation = true
+					NativeName = language.Value.NativeName
 				});
-			}
-			else
-			{
-				result.SupportedLanguages.First(x=>x.Key == language.Key).SupportsTranslation = true;
-			}			
+			}		
 		}
 		foreach (var language in response.Transliteration)
 		{
-			if (!result.SupportedLanguages.Exists(x => x.Key == language.Key))
+			if (!result.SupportedTransliterationLanguages.Exists(x => x.Key == language.Key))
 			{
-				result.SupportedLanguages.Add(new SupportedLanguage()
-				{
-					Key = language.Key,
-					Name = language.Value.Name,
-					SupportsTransliteration = true
-				});
-			}
-			else
-			{
-				result.SupportedLanguages.First(x => x.Key == language.Key).SupportsTransliteration = true;
+				result.SupportedTransliterationLanguages.Add(BuildTransliterationLanguage(language.Key, language.Value));
 			}
 		}
-		foreach (var language in response.Dictionary)
-		{
-			if (!result.SupportedLanguages.Exists(x => x.Key == language.Key))
-			{
-				result.SupportedLanguages.Add(new SupportedLanguage()
-				{
-					Key = language.Key,
-					Name = language.Value.Name,
-					SupportsDictionary = true
-				});
-			}
-			else
-			{
-				result.SupportedLanguages.First(x => x.Key == language.Key).SupportsDictionary = true;
-			}
-		}
-		result.SupportedLanguages.Sort((o1, o2) => o1.Name.CompareTo(o2.Name));
+		result.SupportedTranslationLanguages.Sort((o1, o2) => o1.Name.CompareTo(o2.Name));
+		result.SupportedTransliterationLanguages.Sort((o1, o2) => o1.Name.CompareTo(o2.Name));
 		return result;
+	}
+
+	private SupportedTransliterationLanguage BuildTransliterationLanguage(string languageKey, TransliterationLanguage lang)
+	{
+		SupportedTransliterationLanguage newTransliterationLanguage = new SupportedTransliterationLanguage()
+		{
+			Key = languageKey,
+			Name = lang.Name,
+			NativeName = lang.NativeName
+		};
+
+		foreach (var script in lang.Scripts)
+		{
+			SupportedTransliterationFromScript newScript = new SupportedTransliterationFromScript()
+			{
+				Key = script.Code,
+				Name = script.Name,
+				NativeName = script.NativeName
+			};
+			foreach (var toScript in script.TargetLanguageScripts)
+			{
+				newScript.ToScripts.Add(new SupportedTransliterationToScript()
+				{
+					Key = toScript.Code,
+					Name = toScript.Name,
+					NativeName = toScript.NativeName
+				});
+			}
+			newTransliterationLanguage.Scripts.Add(newScript);
+		}
+
+
+		return newTransliterationLanguage;
 	}
 
 	public async Task<TextTranslationResult> Translate(string targetLangCode, string input, bool outputAsAudio = false, string? voiceName = null)
@@ -114,6 +118,21 @@ public class TextTranslationServices
 			Input = input,
 			Output = translation?.Translations?[0]?.Text,
 			AudioOutput = audioOutput
+		};
+	}
+
+	public async Task<TextTransliterationResult> Transliterate(string sourceLangCode, string fromScriptCode, string toScriptCode, IEnumerable<string> input)
+	{
+		Response<IReadOnlyList<TransliteratedText>> translationResponse = await _translationClient.TransliterateAsync(language: sourceLangCode, toScript: toScriptCode, fromScript: fromScriptCode, content: input);
+		IReadOnlyList<TransliteratedText> transliterations = translationResponse.Value;
+		TransliteratedText transliteration = transliterations[0];
+		return new TextTransliterationResult()
+		{			
+			SourceLanguageCode = sourceLangCode,
+			SourceScriptCode = fromScriptCode,
+			TargetScriptCode = toScriptCode,
+			Input = string.Join(Environment.NewLine, input),
+			Output = transliteration.Text
 		};
 	}
 

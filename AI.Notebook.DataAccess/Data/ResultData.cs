@@ -205,7 +205,9 @@ public class ResultData : IResultData
 		p.Add(name: "@RequestId", item.RequestId);
 		p.Add(name: "@ResultTypeId", item.ResultTypeId);
 		p.Add(name: "@SourceLangCode", item.SourceLangCode);
+		p.Add(name: "@SourceScriptCode", item.SourceScriptCode);
 		p.Add(name: "@TargetLangCode", item.TargetLangCode);
+		p.Add(name: "@TargetScriptCode", item.TargetScriptCode);
 		p.Add(name: "@Input", item.Input);
 		p.Add(name: "@Translate", item.Translate);
 		p.Add(name: "@Transliterate", item.Transliterate);
